@@ -1,0 +1,25 @@
+{
+  "name": "take-the-money-and-run",
+  "version": "1.0.0",
+  "description": "ICM Final Project",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AidanNelson/take-the-money-and-run.git"
+  },
+  "keywords": [
+    "game"
+  ],
+  "author": "Simon & Aidan",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AidanNelson/take-the-money-and-run/issues"
+  },
+  "homepage": "https://github.com/AidanNelson/take-the-money-and-run#readme",
+  "dependencies": {
+    "mongodb": "^2.2.33"
+  }
+}
