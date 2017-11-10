@@ -17,7 +17,7 @@ let video;
 let canvas;
 
 function setup() {
-	canvas = createCanvas(640, 480);
+	canvas = createCanvas(640, 480, WEBGL);
 	canvas.id('p5canvas');
 	video = createCapture(VIDEO);
 	video.size(640,480);
@@ -28,28 +28,32 @@ function setup() {
 	let src = seriously.source('#p5video');
 	let target = seriously.target('#p5canvas');
 
+	let chroma = seriously.effect('chroma');
+	chroma.source = src;
+	target.source = chroma;
+
+	let r = 98 / 255;
+	let g = 175 / 255;
+	let b = 116 / 255;
+	chroma.screen[r,g,b,1];
+
+	seriously.go();
 }
 
 function draw() {
-
 }
 
 // class for player avatar
-class Avatar {
-	constructor(pic,startingBudget,loc,currentTime){
-
-		this.pic = pic; //string to hold profile picture location
-		this.budget = startingBudget; //starting budget
-
-		//location
-		this.latitude = loc.lat;
-		this.longitude = loc.lng;
-
-		this.timeStarted = currentTime
-	}
-
-
-
-
-
-}
+// class Avatar {
+// 	constructor(pic,startingBudget,loc,currentTime){
+//
+// 		this.pic = pic; //string to hold profile picture location
+// 		this.budget = startingBudget; //starting budget
+//
+// 		//location
+// 		this.latitude = loc.lat;
+// 		this.longitude = loc.lng;
+//
+// 		this.timeStarted = currentTime
+// 	}
+// }
