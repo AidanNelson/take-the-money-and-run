@@ -42,7 +42,7 @@ function setup(){
   loginButton.mousePressed(sendLoginAttempt);
 
   //initialize socket connection to server
-  socket = io.connect('http://localhost:3000');
+  socket = io.connect('https://take-the-money-and-run.herokuapp.com/');
   socket.on('login', gotLoginResponse);
 }
 
