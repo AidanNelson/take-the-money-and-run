@@ -49,8 +49,10 @@ function setup(){
 function gotLoginResponse(data){
   if (data){
     console.log("Current User: " + data.name);
+    currentProfile = data;
   } else {
     console.log("No match. Please try again.");
+    currentProfile = null;
   }
 }
 
