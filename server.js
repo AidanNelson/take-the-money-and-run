@@ -14,6 +14,9 @@ https://www.youtube.com/watch?v=JrHT1iqSrAQ
 
 Firebase Documentation:
 https://firebase.google.com/docs/web/setup
+
+Socket.io:
+https://stackoverflow.com/questions/4647348/send-message-to-specific-client-with-socket-io-and-node-js
 */
 
 // express
@@ -34,14 +37,15 @@ io.sockets.on('connection', newConnection);
 
 // what to do with a newly opened socket
 function newConnection(socket) {
-  console.log('New socket connection: ' + socket.id);
+  let socketID = socket.id;
+  console.log('New socket connection: ' + socketID);
 
   // for this socket, define event handlers:
   socket.on('newProfile', addProfile);
 
-  function addProfile(profile){
-    console.log("Adding to DB:  " + profile.name);
-    profiles.push(profile, finished);
+  function addProfile(data){
+    console.log("Adding to DB:  " + data.name);
+    profiles.push(data, finished);
   }
 
   function finished(err){
@@ -56,15 +60,25 @@ function newConnection(socket) {
   socket.on('login',checkLogin);
 
   function checkLogin(loginName){
+    let isFound = false;
     console.log("Login Attempt by: " + loginName);
     for (let i=0; i<localProfiles.length;i++){
       if (localProfiles[i].name == loginName){
         console.log("\"" + loginName + "\" matches DB name \"" + localProfiles[i].name +"\"");
-        socket.broadcast.emit('loginResponse', true);
+        let prof = {
+          name:localProfiles[i].name,
+          budget:localProfiles[i].budget,
+          location:localProfiles[i].location
+        }
+        io.sockets.emit('login', prof);
+        isFound = true;
         break;
       }
   	}
-    socket.broadcast.emit('loginResponse', false);
+    console.log("No matches.")
+    if (!isFound){
+      io.sockets.emit('login', false);
+    }
   }
 }
 
@@ -97,6 +111,7 @@ profiles.on('value', gotProfiles, gotErr);
 
 function gotProfiles(data){
   console.log("Got profiles.");
+  let newProfileArray = [];
   let allProfiles = data.val();
   let myKeys = Object.keys(allProfiles);
   for (let i=0;i<myKeys.length;i++){
@@ -106,8 +121,9 @@ function gotProfiles(data){
       budget:allProfiles[k].budget,
       location:allProfiles[k].location
     }
-    localProfiles.push(profile);
+    newProfileArray.push(profile); //add profiles to a new array
   }
+  localProfiles = newProfileArray;
 }
 
 function gotErr(err){

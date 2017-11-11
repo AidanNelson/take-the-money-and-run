@@ -9,49 +9,49 @@ go to work, and live out your decidedly more inhibited life.  Enjoy.
 
 Sources:
 Mappa: https://github.com/cvalenzuela/Mappa
-Seriously.js:
-	https://github.com/brianchirls/Seriously.js/
-	https://www.youtube.com/watch?v=jdKep6jo7b0
+
+
 
 
 */
-
-
 let socket;
-let submitButton;
 
 let nameInput;
 let budgetInput;
 let locationInput;
+let submitButton;
 
+let loginInput;
 let loginButton;
 
 let currentProfile;
 
 function setup(){
-  socket = io.connect('http://localhost:3000');
-  socket.on('loginResponse', gotLoginResponse);
-
-  submitButton = createButton("Submit");
-  submitButton.mousePressed(sendNewProfile);
+  createElement('br');
 
   nameInput = createInput("name");
   budgetInput = createInput("budget");
   locationInput = createInput("location");
+  submitButton = createButton("submit new profile");
+  submitButton.mousePressed(sendNewProfile);
 
-  createElement('br');
-  createElement('br');
   createElement('br');
 
   loginInput = createInput("login name");
   loginButton = createButton("login");
   loginButton.mousePressed(sendLoginAttempt);
+
+  //initialize socket connection to server
+  socket = io.connect('http://localhost:3000');
+  socket.on('login', gotLoginResponse);
 }
 
 function gotLoginResponse(data){
-  // let currentProfile = data;
-  // if (currentProfile);
-  console.log("got a response");
+  if (data){
+    console.log("Current User: " + data.name);
+  } else {
+    console.log("No match. Please try again.");
+  }
 }
 
 function sendLoginAttempt(){
@@ -65,8 +65,7 @@ function sendNewProfile(){
     budget: budgetInput.value(),
     location: locationInput.value()
   }
-  console.log(profile);
-  console.log("sending new profile");
+  console.log("Sending new profile");
   socket.emit('newProfile',profile);
 }
 
