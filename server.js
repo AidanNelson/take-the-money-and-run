@@ -22,7 +22,7 @@ https://stackoverflow.com/questions/4647348/send-message-to-specific-client-with
 // express
 let express = require('express');
 let app = express();
-let server = app.listen(3000); //set listening port
+let server = app.listen(process.env.PORT || 3000); //set listening port
 app.use(express.static('public')); //serve up folder 'public'
 console.log("Server is running.");
 
