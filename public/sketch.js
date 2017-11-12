@@ -45,7 +45,7 @@ let options = {
 }
 
 function preload(){
-  airports = loadTable("airports.txt","csv","header");
+  airports = loadTable("assets/airports.txt","csv","header");
 }
 
 
