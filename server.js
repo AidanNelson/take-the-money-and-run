@@ -3,9 +3,9 @@ server.js
 Take the Money and Run
 
 Server for game in three parts:
-  1. node.js server using express framework serving public files
-  2. socket.io to communicate with public profiles
-  3. firebase to store and retreive information
+1. node.js server using express framework serving public files
+2. socket.io to communicate with public profiles
+3. firebase to store and retreive information
 
 links:
 Dan Shiffman on Node / Express / Sockets / Firebase:
@@ -45,6 +45,7 @@ function newConnection(socket) {
 
   function addProfile(data){
     console.log("Adding to DB:  " + data.name);
+    // FIRST  , check that no other profiles exist w same name!!
     profiles.push(data, finished);
   }
 
@@ -52,34 +53,38 @@ function newConnection(socket) {
     if (err){
       console.log("Error!");
     } else{
-      console.log("Data saved!")
+      console.log("New profile saved!");
     }
   }
 
   // event handler for a login attempt
   socket.on('login',checkLogin);
 
-  function checkLogin(loginName){
+  function checkLogin(data){
     let isFound = false;
-    console.log("Login Attempt by: " + loginName);
+
+    console.log("Login attempt by: " + data);
+
     for (let i=0; i<localProfiles.length;i++){
-      if (localProfiles[i].name == loginName){
-        console.log("\"" + loginName + "\" matches DB name \"" + localProfiles[i].name +"\"");
-        let prof = {
-          name:localProfiles[i].name,
-          budget:localProfiles[i].budget,
-          location:localProfiles[i].location
-        }
-        io.sockets.emit('login', prof);
+      if (localProfiles[i].name == data){
+        console.log("\"" + data + "\" matches DB name \"" + localProfiles[i].name +"\"");
+        io.sockets.emit('login', localProfiles[i]);
         isFound = true;
         break;
       }
-  	}
-    console.log("No matches.")
+    }
     if (!isFound){
+      console.log("No matches in databse for: " + "\"" + data + "\"");
       io.sockets.emit('login', false);
     }
   }
+
+  socket.on('update', updateLocations);
+
+  function updateLocations(data){
+    
+  }
+
 }
 
 
@@ -95,12 +100,12 @@ let profiles;
 let localProfiles = [];
 
 let config = {
-	apiKey: "AIzaSyCNXWvMxraT7PTKKCLk4uzaQD-XNhzqw84",
-	authDomain: "windemere-44.firebaseapp.com",
-	databaseURL: "https://windemere-44.firebaseio.com",
-	projectId: "windemere-44",
-	storageBucket: "",
-	messagingSenderId: "115375595951"
+  apiKey: "AIzaSyCNXWvMxraT7PTKKCLk4uzaQD-XNhzqw84",
+  authDomain: "windemere-44.firebaseapp.com",
+  databaseURL: "https://windemere-44.firebaseio.com",
+  projectId: "windemere-44",
+  storageBucket: "",
+  messagingSenderId: "115375595951"
 };
 
 // Initialize Firebase
@@ -111,19 +116,17 @@ profiles.on('value', gotProfiles, gotErr);
 
 function gotProfiles(data){
   console.log("Got profiles.");
-  let newProfileArray = [];
-  let allProfiles = data.val();
-  let myKeys = Object.keys(allProfiles);
-  for (let i=0;i<myKeys.length;i++){
-    let k=myKeys[i];
-    let profile = {
-      name: allProfiles[k].name,
-      budget:allProfiles[k].budget,
-      location:allProfiles[k].location
+  console.log(data.val());
+  if (data.val()) { //ensure there is some before trying to make an array
+    let newProfileArray = [];
+    let dbProfiles = data.val();
+    let myKeys = Object.keys(dbProfiles);
+    for (let i=0;i<myKeys.length;i++){
+      let k=myKeys[i];
+      newProfileArray.push(dbProfiles[k]); //add profiles to a new array
     }
-    newProfileArray.push(profile); //add profiles to a new array
+    localProfiles = newProfileArray;
   }
-  localProfiles = newProfileArray;
 }
 
 function gotErr(err){

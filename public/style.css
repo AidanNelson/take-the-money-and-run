@@ -1,0 +1,44 @@
+@font-face {
+  font-family: 'oregon-trail';
+  src: url('here_lies.woff') format('woff'), /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+   url('here_lies.ttf') format('truetype'); /* Chrome 4+, Firefox 3.5, Opera 10+, Safari 3—5 */
+}
+
+body {
+  margin:0;
+  padding:0;
+  overflow: hidden;
+}
+
+
+#mapCanvas {
+  margin:auto;
+  position:absolute;
+  top:0px;
+}
+
+#loginScreen {
+  border:dashed;
+  z-index:20;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 300px;
+  height: 200px;
+  background-color:#5DE4FF;
+}
+
+.login {
+  padding:4px;
+  margin:4px;
+}
+
+#control {
+  position:absolute;
+  background-color:black;
+  width:auto;
+  height:200px;
+  font-family: oregon-trail;
+  color: white;
+}
