@@ -85,7 +85,7 @@ function makeLoginScreen(){
   loginButton = createButton("login").parent('loginScreen').class('login');
   loginButton.mousePressed(sendLoginAttempt);
 
-  updateButton = createButton("update").parent('loginScreen');
+  updateButton = createButton("update");
   updateButton.mousePressed(updateProfile);
 }
 

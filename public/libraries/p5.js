@@ -896,7 +896,7 @@ Promise.prototype = {
     The primary way of interacting with a promise is through its `then` method,
     which registers callbacks to receive either a promise's eventual value or the
     reason why the promise cannot be fulfilled.
-  
+
     ```js
     findUser().then(function(user){
       // user is available
@@ -904,14 +904,14 @@ Promise.prototype = {
       // user is unavailable, and you are given the reason why
     });
     ```
-  
+
     Chaining
     --------
-  
+
     The return value of `then` is itself a promise.  This second, 'downstream'
     promise is resolved with the return value of the first promise's fulfillment
     or rejection handler, or rejected if the handler throws an exception.
-  
+
     ```js
     findUser().then(function (user) {
       return user.name;
@@ -921,7 +921,7 @@ Promise.prototype = {
       // If `findUser` fulfilled, `userName` will be the user's name, otherwise it
       // will be `'default name'`
     });
-  
+
     findUser().then(function (user) {
       throw new Error('Found user, but still unhappy');
     }, function (reason) {
@@ -934,7 +934,7 @@ Promise.prototype = {
     });
     ```
     If the downstream promise does not specify a rejection handler, rejection reasons will be propagated further downstream.
-  
+
     ```js
     findUser().then(function (user) {
       throw new PedagogicalException('Upstream error');
@@ -946,15 +946,15 @@ Promise.prototype = {
       // The `PedgagocialException` is propagated all the way down to here
     });
     ```
-  
+
     Assimilation
     ------------
-  
+
     Sometimes the value you want to propagate to a downstream promise can only be
     retrieved asynchronously. This can be achieved by returning a promise in the
     fulfillment or rejection handler. The downstream promise will then be pending
     until the returned promise is settled. This is called *assimilation*.
-  
+
     ```js
     findUser().then(function (user) {
       return findCommentsByAuthor(user);
@@ -962,9 +962,9 @@ Promise.prototype = {
       // The user's comments are now available
     });
     ```
-  
+
     If the assimliated promise rejects, then the downstream promise will also reject.
-  
+
     ```js
     findUser().then(function (user) {
       return findCommentsByAuthor(user);
@@ -974,15 +974,15 @@ Promise.prototype = {
       // If `findCommentsByAuthor` rejects, we'll have the reason here
     });
     ```
-  
+
     Simple Example
     --------------
-  
+
     Synchronous Example
-  
+
     ```javascript
     let result;
-  
+
     try {
       result = findResult();
       // success
@@ -990,9 +990,9 @@ Promise.prototype = {
       // failure
     }
     ```
-  
+
     Errback Example
-  
+
     ```js
     findResult(function(result, err){
       if (err) {
@@ -1002,9 +1002,9 @@ Promise.prototype = {
       }
     });
     ```
-  
+
     Promise Example;
-  
+
     ```javascript
     findResult().then(function(result){
       // success
@@ -1012,15 +1012,15 @@ Promise.prototype = {
       // failure
     });
     ```
-  
+
     Advanced Example
     --------------
-  
+
     Synchronous Example
-  
+
     ```javascript
     let author, books;
-  
+
     try {
       author = findAuthor();
       books  = findBooksByAuthor(author);
@@ -1029,19 +1029,19 @@ Promise.prototype = {
       // failure
     }
     ```
-  
+
     Errback Example
-  
+
     ```js
-  
+
     function foundBooks(books) {
-  
+
     }
-  
+
     function failure(reason) {
-  
+
     }
-  
+
     findAuthor(function(author, err){
       if (err) {
         failure(err);
@@ -1066,9 +1066,9 @@ Promise.prototype = {
       }
     });
     ```
-  
+
     Promise Example;
-  
+
     ```javascript
     findAuthor().
       then(findBooksByAuthor).
@@ -1078,7 +1078,7 @@ Promise.prototype = {
       // something went wrong
     });
     ```
-  
+
     @method then
     @param {Function} onFulfilled
     @param {Function} onRejected
@@ -1090,25 +1090,25 @@ Promise.prototype = {
   /**
     `catch` is simply sugar for `then(undefined, onRejection)` which makes it the same
     as the catch block of a try/catch statement.
-  
+
     ```js
     function findAuthor(){
       throw new Error('couldn't find that author');
     }
-  
+
     // synchronous
     try {
       findAuthor();
     } catch(reason) {
       // something went wrong
     }
-  
+
     // async with promises
     findAuthor().catch(function(reason){
       // something went wrong
     });
     ```
-  
+
     @method catch
     @param {Function} onRejection
     Useful for tooling.
@@ -20416,6 +20416,87 @@ p5.prototype.saveCanvas = function() {
     imageData = imageData.replace(mimeType, downloadMime);
 
     p5.prototype.downloadFile(imageData, filename, extension);
+  }
+};
+
+//special function magic
+p5.prototype.returnImageData = function() {
+
+  var cnv, filename, extension;
+  if (arguments.length === 3) {
+    cnv = arguments[0];
+    filename = arguments[1];
+    extension = arguments[2];
+  } else if (arguments.length === 2) {
+    if (typeof arguments[0] === 'object') {
+      cnv = arguments[0];
+      filename = arguments[1];
+    } else {
+      filename = arguments[0];
+      extension = arguments[1];
+    }
+  } else if (arguments.length === 1) {
+    if (typeof arguments[0] === 'object') {
+      cnv = arguments[0];
+    } else {
+      filename = arguments[0];
+    }
+  }
+
+  if (cnv instanceof p5.Element) {
+    cnv = cnv.elt;
+  }
+  if (!(cnv instanceof HTMLCanvasElement)) {
+    cnv = null;
+  }
+
+  if (!extension) {
+    extension = p5.prototype._checkFileExtension(filename, extension)[1];
+    if (extension === '') {
+      extension = 'png';
+    }
+  }
+
+  if (!cnv) {
+    if (this._curElement && this._curElement.elt) {
+      cnv = this._curElement.elt;
+    }
+  }
+
+  if ( p5.prototype._isSafari() ) {
+    var aText = 'Hello, Safari user!\n';
+    aText += 'Now capturing a screenshot...\n';
+    aText += 'To save this image,\n';
+    aText += 'go to File --> Save As.\n';
+    alert(aText);
+    window.location.href = cnv.toDataURL();
+  } else {
+    var mimeType;
+    if (typeof(extension) === 'undefined') {
+      extension = 'png';
+      mimeType = 'image/png';
+    }
+    else {
+      switch(extension){
+        case 'png':
+          mimeType = 'image/png';
+          break;
+        case 'jpeg':
+          mimeType = 'image/jpeg';
+          break;
+        case 'jpg':
+          mimeType = 'image/jpeg';
+          break;
+        default:
+          mimeType = 'image/png';
+          break;
+      }
+    }
+    var downloadMime = 'image/octet-stream';
+    var imageData = cnv.toDataURL(mimeType);
+    imageData = imageData.replace(mimeType, downloadMime);
+    return imageData;
+    // p5.prototype.downloadFile(imageData, filename, extension);
   }
 };
 

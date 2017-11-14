@@ -1,5 +1,5 @@
 class Profile{
-  constructor(data){
+  constructor(data, myKey){
     this.name = data.name;
     this.budget = data.budget;
     this.locations = data.locations;

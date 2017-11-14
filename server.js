@@ -1,4 +1,6 @@
 /*
+
+serverProfiles
 server.js
 Take the Money and Run
 
@@ -46,19 +48,30 @@ function newConnection(socket) {
   // for this socket, define event handlers:
   socket.on('newProfile', addProfile);
 
-  function addProfile(data){
-    console.log("Adding to DB:  " + data.name);
-    // FIRST  , check that no other profiles exist w same name!!
-    profiles.push(data, finished);
+  function addProfile(clientData){
+    let profileExists = false;
+
+    console.log("checking if profile already exists");
+    for (i=0; i<serverProfiles.length; i++){
+      if (clientData.name == serverProfiles[i].profile.name){
+        console.log("Profile already exists!");
+        io.sockets.emit('newProfile', "Profile already exists!");
+        profileExists = true;
+      }
+    }
+    if (!profileExists){
+      console.log("Adding to DB:  " + clientData.name);
+      fbProfiles.push(clientData, finished);
+    }
   }
 
   function finished(err){
     if (err){
       console.log("Error!");
-      io.sockets.emit('newProfile', false);
+      io.sockets.emit('newProfile', "Error!");
     } else{
       console.log("New profile saved!");
-      io.sockets.emit('newProfile', true);
+      io.sockets.emit('newProfile', "New Profile Saved!");
     }
   }
 
@@ -70,10 +83,10 @@ function newConnection(socket) {
 
     console.log("Login attempt by: " + data);
 
-    for (let i=0; i<localProfiles.length;i++){
-      if (localProfiles[i].name == data){
-        console.log("\"" + data + "\" matches DB name \"" + localProfiles[i].name +"\"");
-        io.sockets.emit('login', localProfiles[i]); //send profile back to client / user
+    for (let i=0; i<serverProfiles.length;i++){
+      if (serverProfiles[i].profile.name == data){
+        console.log("\"" + data + "\" matches DB name \"" + serverProfiles[i].profile.name +"\"");
+        io.sockets.emit('login', serverProfiles[i].profile); //send profile back to client / user
         isFound = true;
         break;
       }
@@ -84,12 +97,19 @@ function newConnection(socket) {
     }
   }
 
-  socket.on('update', updateLocations);
+  socket.on('update', updateProfile);
 
-  function updateLocations(data){
-    //update function here
+  function updateProfile(clientProfile){
+    //find key that matches name
+    for (let i=0; i<serverProfiles.length; i++){
+      if (serverProfiles[i].profile.name == clientProfile.name){
+        //send client profile to server
+        let profileReference = database.ref('profiles/' + serverProfiles[i].key);
+        profileReference.set(clientProfile);
+        break;
+      }
+    }
   }
-
 }
 
 
@@ -100,9 +120,9 @@ let firebase = require("firebase");
 
 //database variables
 let database;
-let profiles;
+let fbProfiles;
 
-let localProfiles = [];
+let serverProfiles = [];
 
 let config = {
   apiKey: "AIzaSyCNXWvMxraT7PTKKCLk4uzaQD-XNhzqw84",
@@ -116,21 +136,25 @@ let config = {
 // Initialize Firebase
 firebase.initializeApp(config);
 database = firebase.database();
-profiles = database.ref('profiles');
-profiles.on('value', gotProfiles, gotErr);
+fbProfiles = database.ref('profiles');
+fbProfiles.on('value', gotProfiles, gotErr);
 
-function gotProfiles(data){
+function gotProfiles(fbData){
   console.log("Got profiles.");
-  console.log(data.val());
-  if (data.val()) { //ensure there is some before trying to make an array
+  console.log(fbData.val());
+  if (fbData.val()) { //ensure there is some before trying to make an array
     let newProfileArray = [];
-    let dbProfiles = data.val();
+    let dbProfiles = fbData.val();
     let myKeys = Object.keys(dbProfiles);
     for (let i=0;i<myKeys.length;i++){
       let k=myKeys[i];
-      newProfileArray.push(dbProfiles[k]); //add profiles to a new array
+      let newProf = {
+        key: k,
+        profile:dbProfiles[k]
+      }
+      newProfileArray.push(newProf); //add profiles to a new array
     }
-    localProfiles = newProfileArray;
+    serverProfiles = newProfileArray;
   }
 }
 
