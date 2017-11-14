@@ -18,15 +18,10 @@ let socket;
 let nameInput;
 let budgetInput;
 let locationInput;
-let submitButton;
-let loginInput;
-let loginButton;
 
-let updateButton;
 
 //html element
 let controlDiv
-
 
 //do we have a profiles
 let currentProfile = null;
@@ -34,10 +29,16 @@ let currentProfile = null;
 //table for airports
 let airports;
 
+//canvas
+let canvas;
+let webcam;
+let mask;
+
+let profilePic;
+let isLoggedIn = false;
 
 //create variables to hold the map, canvas, and "Mappa" instance
 let myMap;
-let canvas;
 let mappa;
 
 // options for mappa object
@@ -53,13 +54,23 @@ let options = {
 //preload airports data
 function preload(){
   airports = loadTable("assets/airports.txt","csv","header");
+  mask = loadImage("assets/mask.png");
 }
 
 
 function setup(){
-  makeMappa();
+
+  canvas = createCanvas(640,480);
+  canvas.id('canvas');
+  webcam = createCapture(VIDEO);
+  webcam.size(640, 480);
+  webcam.hide();
+
+
   makeLoginScreen();
-  makeGameControls();
+
+  // makeMappa();
+  // makeGameControls();
   // initialize socket connection to server
   // socket = io.connect('https://take-the-money-and-run.herokuapp.com/');
   socket = io.connect('http://localhost:3000');
@@ -72,30 +83,88 @@ function makeLoginScreen(){
   let loginScreen = createElement('div');
   loginScreen.id('loginScreen');
 
+  //picture taking stuff
+  let snapButton = createButton("snap").parent('loginScreen').class('login');
+  snapButton.mousePressed(takeProfilePicture);
+  let resetPictureButton = createButton("reset").parent('loginScreen').class('login');
+  resetPictureButton.mousePressed(resetProfilePicture);
+
+  createElement('br').parent('loginScreen').class('login');
+
   nameInput = createInput("name").parent('loginScreen').class('login');
   budgetInput = createInput("budget").parent('loginScreen').class('login');
   locationInput = createInput("location").parent('loginScreen').class('login');
-  submitButton = createButton("submit new profile").parent('loginScreen').class('login');
+  let submitButton = createButton("submit new profile").parent('loginScreen').class('login');
   submitButton.mousePressed(sendNewProfile);
 
   createElement('br').parent('loginScreen').class('login');
   createElement('br').parent('loginScreen').class('login');
 
   loginInput = createInput("login name").parent('loginScreen').class('login');
-  loginButton = createButton("login").parent('loginScreen').class('login');
+  let loginButton = createButton("login").parent('loginScreen').class('login');
   loginButton.mousePressed(sendLoginAttempt);
 
-  updateButton = createButton("update").parent('loginScreen');
+  let updateButton = createButton("update").parent('loginScreen');
   updateButton.mousePressed(updateProfile);
 }
 
+
+function takeProfilePicture() {
+  profilePic = webcam.get();
+
+  //get pixels for the new picture and the mask
+  profilePic.loadPixels();
+  mask.loadPixels();
+
+  //remove white masked areas from profile pic by setting alpha to zero
+  for (let x=0;x<width;x++){
+    for (let y=0;y<height;y++){
+      let pixelRef = (x + y*width)*4;
+      let maskAlpha = mask.pixels[pixelRef + 3];
+      if (maskAlpha != 0){
+        profilePic.pixels[pixelRef + 3] = 0;
+      }
+    }
+  }
+  profilePic.updatePixels();
+  console.log('done');
+  save(profilePic,"myImg.png");
+}
+
+function resetProfilePicture() {
+  profilePic = false;
+  webcam = createCapture(VIDEO);
+  webcam.size(640, 480);
+  webcam.hide();
+}
+
+
+
+function draw(){
+  if (isLoggedIn){
+
+  } else{
+    clear();
+    if (profilePic) {
+      image(profilePic, 0, 0);
+    } else {
+      push();
+      //reverse webcam feed
+      translate(width,0);
+      scale(-1,1);
+      image(webcam, 0, 0);
+      pop();
+      image(mask, 0, 0,);
+    }
+  }
+}
 
 
 
 function makeMappa(){
   //Mappa library requirements
-  canvas = createCanvas(windowWidth, windowHeight-200);
-  canvas.id('mapCanvas');
+  resizeCanvas(windowWidth, windowHeight);
+
   mappa = new Mappa('Leaflet');
   //call mappa object to create a tilemap at lat,long, zoom level
   myMap = mappa.tileMap(options);
@@ -181,6 +250,10 @@ function gotLoginResponse(data){
     currentProfile = new Profile(data);
     //get rid of login box by hiding it
     select('#loginScreen').style("z-index", "-1");
+    //get rid of image canvas and make mappa canvas...
+    isLoggedIn = true;
+    webcam.remove();
+    makeMappa();
   } else { // if data == false
     console.log("No match. Please try again.");
     currentProfile = null;
@@ -196,7 +269,8 @@ function sendNewProfile(){
   let profile = {
     name: nameInput.value(),
     budget: budgetInput.value(),
-    locations: [locationInput.value()]
+    locations: [locationInput.value()],
+    profilePicture: p5.prototype.returnImageData(canvas)
   }
   socket.emit('newProfile',profile);
 }
@@ -208,11 +282,11 @@ function newProfileResponse(data){
 
 //send update to server then to firebase
 function updateProfile(){
-  console.log("Updating user profile.");
-  let profile = {
-    name: nameInput.value(),
-    budget: budgetInput.value(),
-    locations: [locationInput.value()]
-  }
+  console.log("Updating current user profile.");
+  // let profile = {
+  //   name: nameInput.value(),
+  //   budget: budgetInput.value(),
+  //   locations: [locationInput.value()]
+  // }
   socket.emit('update', profile);
 }
