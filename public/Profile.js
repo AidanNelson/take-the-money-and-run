@@ -6,34 +6,35 @@ class Profile{
     this.profilePicture = loadImage(data.profilePicture);
   }
 
-  // displayRoutes(){
-  //   //iterate through all locations in current profile
-  //   for (let i=0;i<this.locations.length;i++){
-  //     let loc = this.locations[i];
-  //     //check through all airports for matching IATA code
-  //     for (let r = 0; r < airports.getRowCount(); r++) {
-  //       let airport = airports.getString(r, 13); //IATA Code
-  //       // console.log('checking ' + loc + ' against ' + airport);
-  //       if (loc == airport){
-  //         // console.log("Matching: " + loc + " / " + airport);
-  //         let lat = airports.getString(r, 4);
-  //         let lng = airports.getString(r, 5);
-  //
-  //         let pos = myMap.latLngToPixel(lat, lng);
-  //         fill(255);
-  //         ellipse(pos.x, pos.y, 5, 5);
-  //         break;
-  //       } else{
-  //         // console.log('No match found.');
-  //       }
-  //     }
-  //   }
-  //
+  forServer(){
+    return {
+      name: this.name,
+      budget: this.budget,
+      locations: this.locations,
+      profilePicture: p5.prototype.returnImageData(this.profilePicture)
+    };
+  }
 
-  //   for (let i=0; i<this.locations.length;i++){
-  //     //get lat and long of locations
-  //     //get pixel location of locations latlngtopixel
-  //     //disply as an ellipse and a dashed 'great circle' line between locations
-  //   }
-  // }
+  displayRoutes(){
+    //iterate through all locations in current profile
+    for (let i=0;i<this.locations.length;i++){
+
+      let loc = this.locations[i];
+      //check through all airports for matching IATA code
+      for (let r = 0; r < airports.getRowCount(); r++) {
+        let airport = airports.getString(r, 13); //IATA Code
+        // console.log('checking ' + loc + ' against ' + airport);
+        if (loc == airport){
+          // console.log("Matching: " + loc + " / " + airport);
+          let lat = airports.getString(r, 4);
+          let lng = airports.getString(r, 5);
+
+          let pos = myMap.latLngToPixel(lat, lng);
+          fill(255);
+          ellipse(pos.x, pos.y, 5, 5);
+          break;
+        }
+      }
+    }
+  }
 }

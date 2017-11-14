@@ -35,6 +35,7 @@ body {
 }
 
 #control {
+  padding: 10px;
   position:absolute;
   background-color:black;
   width:auto;
