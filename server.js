@@ -19,6 +19,7 @@ Socket.io:
 https://stackoverflow.com/questions/4647348/send-message-to-specific-client-with-socket-io-and-node-js
 */
 
+
 // express
 let express = require('express');
 let app = express();
@@ -31,6 +32,8 @@ console.log("Server is running.");
 // sockets
 let socket = require('socket.io');
 let io = socket(server);
+
+
 
 // sockets event handler for 'connection' event
 io.sockets.on('connection', newConnection);
@@ -52,8 +55,10 @@ function newConnection(socket) {
   function finished(err){
     if (err){
       console.log("Error!");
+      io.sockets.emit('newProfile', false);
     } else{
       console.log("New profile saved!");
+      io.sockets.emit('newProfile', true);
     }
   }
 
@@ -68,21 +73,21 @@ function newConnection(socket) {
     for (let i=0; i<localProfiles.length;i++){
       if (localProfiles[i].name == data){
         console.log("\"" + data + "\" matches DB name \"" + localProfiles[i].name +"\"");
-        io.sockets.emit('login', localProfiles[i]);
+        io.sockets.emit('login', localProfiles[i]); //send profile back to client / user
         isFound = true;
         break;
       }
     }
     if (!isFound){
       console.log("No matches in databse for: " + "\"" + data + "\"");
-      io.sockets.emit('login', false);
+      io.sockets.emit('login', false); //send false back to client
     }
   }
 
   socket.on('update', updateLocations);
 
   function updateLocations(data){
-    
+    //update function here
   }
 
 }

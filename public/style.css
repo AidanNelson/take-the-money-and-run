@@ -11,11 +11,11 @@ body {
 }
 
 
-#mapCanvas {
+/*#mapCanvas {
   margin:auto;
   position:absolute;
   top:0px;
-}
+}*/
 
 #loginScreen {
   border:dashed;

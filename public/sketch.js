@@ -11,21 +11,25 @@ Sources:
 Mappa: https://github.com/cvalenzuela/Mappa
 
 */
-
+//socket to communicate w server
 let socket;
 
+//inputs
 let nameInput;
 let budgetInput;
 let locationInput;
 let submitButton;
-
 let loginInput;
 let loginButton;
 
+//html element
 let controlDiv
 
+
+//do we have a profiles
 let currentProfile = null;
 
+//table for airports
 let airports;
 
 
@@ -44,6 +48,7 @@ let options = {
   style: "http://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png"
 }
 
+//preload airports data
 function preload(){
   airports = loadTable("assets/airports.txt","csv","header");
 }
@@ -52,12 +57,34 @@ function preload(){
 function setup(){
   makeMappa();
   makeLoginScreen();
-  makeControls();
+  makeGameControls();
   // initialize socket connection to server
   // socket = io.connect('https://take-the-money-and-run.herokuapp.com/');
   socket = io.connect('http://localhost:3000');
   socket.on('login', gotLoginResponse);
+  socket.on('newProfile',newProfileResponse);
 }
+
+
+function makeLoginScreen(){
+  let loginScreen = createElement('div');
+  loginScreen.id('loginScreen');
+
+  nameInput = createInput("name").parent('loginScreen').class('login');
+  budgetInput = createInput("budget").parent('loginScreen').class('login');
+  locationInput = createInput("location").parent('loginScreen').class('login');
+  submitButton = createButton("submit new profile").parent('loginScreen').class('login');
+  submitButton.mousePressed(sendNewProfile);
+
+  createElement('br').parent('loginScreen').class('login');
+  createElement('br').parent('loginScreen').class('login');
+
+  loginInput = createInput("login name").parent('loginScreen').class('login');
+  loginButton = createButton("login").parent('loginScreen').class('login');
+  loginButton.mousePressed(sendLoginAttempt);
+}
+
+
 
 
 function makeMappa(){
@@ -72,7 +99,12 @@ function makeMappa(){
   myMap.onChange(drawRoute);
 }
 
-function makeControls(){
+
+
+
+
+
+function makeGameControls(){
   controlDiv = createElement('div');
   controlDiv.id('control');
 
@@ -82,6 +114,10 @@ function makeControls(){
   controlDiv.style('top',String(windowHeight-200).concat('px'));
   controlDiv.style('width',String(windowWidth).concat('px'));
 }
+
+
+
+
 
 
 function drawRoute(){
@@ -115,23 +151,6 @@ function drawRoute(){
 
 
 
-function makeLoginScreen(){
-  let loginScreen = createElement('div');
-  loginScreen.id('loginScreen');
-
-  nameInput = createInput("name").parent('loginScreen').class('login');
-  budgetInput = createInput("budget").parent('loginScreen').class('login');
-  locationInput = createInput("location").parent('loginScreen').class('login');
-  submitButton = createButton("submit new profile").parent('loginScreen').class('login');
-  submitButton.mousePressed(sendNewProfile);
-
-  createElement('br').parent('loginScreen').class('login');
-  createElement('br').parent('loginScreen').class('login');
-
-  loginInput = createInput("login name").parent('loginScreen').class('login');
-  loginButton = createButton("login").parent('loginScreen').class('login');
-  loginButton.mousePressed(sendLoginAttempt);
-}
 
 
 
@@ -143,26 +162,30 @@ function makeLoginScreen(){
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 // SOCKETS STUFF
+
+// attempt to login to server
+function sendLoginAttempt(){
+  console.log("Attempting login by: " + loginInput.value());
+  socket.emit('login',loginInput.value());
+}
+// response from server to login attempt
 function gotLoginResponse(data){
   if (data){
     console.log("Current User: " + data.name);
-    console.log("Current User's locations: " + data.locations);
     //initialize the current profile object with data from database
     currentProfile = new Profile(data);
     //get rid of login box by hiding it
     select('#loginScreen').style("z-index", "-1");
-  } else {
+  } else { // if data == false
     console.log("No match. Please try again.");
     currentProfile = null;
   }
 }
 
-function sendLoginAttempt(){
-  console.log("Attempting login by: " + loginInput.value());
-  socket.emit('login',loginInput.value());
-}
 
 
+
+// attempt to send a new profile to the server
 function sendNewProfile(){
   console.log("Sending new profile");
   let profile = {
@@ -171,6 +194,16 @@ function sendNewProfile(){
     locations: [locationInput.value()]
   }
   socket.emit('newProfile',profile);
+}
+
+// new profile response function
+function newProfileResponse(data){
+  if (data){
+    console.log('Profile saved!');
+  } else {
+    console.log('Try again!');
+  }
+
 }
 
 // function updateLocations(){
