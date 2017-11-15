@@ -54,7 +54,10 @@ let options = {
 //text
 let controlText = "Where to next?"
 
+//div for all controls
 let bottomBar;
+
+
 
 
 
@@ -66,6 +69,44 @@ function preload(){
   mask = loadImage("assets/mask.png");
 }
 
+
+function makePostcard() {
+  let iata = currentProfile.locations[currentProfile.locations.length-1];
+  console.log('make postcard of ' + iata);
+
+
+  for (var r = 0; r < airports.getRowCount(); r++) {
+    if (airports.getString(r, 14) == iata){
+      console.log('found airport');
+      let city = airports.getString(r,10);
+      let searchWord = city;
+      let flickrAPI = "https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=43d46d0671093b54323ba9147cc4cc11&tags=" + searchWord + "&per_page=10&format=json&nojsoncallback=1";
+      loadJSON(flickrAPI, displayRandomImage);
+
+    }
+  }
+
+  function displayRandomImage(jsonData){
+    let urls = [];
+    for (var i = 0 ; i < 10 ; i++ ) {
+      let server = jsonData.photos.photo[i].server;
+      let secret = jsonData.photos.photo[i].secret;
+      let id = jsonData.photos.photo[i].id;
+
+      let newUrl  = "https://farm1.staticflickr.com/" + server + "/" + id + "_" + secret + "_b.jpg";
+      urls.push(newUrl);
+      console.log(newUrl);
+    }
+    console.log(urls);
+
+    let pcDiv = createElement('div');
+    pcDiv.id('postcard');
+    let bgImg = createImg(urls[floor(random(urls.length))]).parent('postcard').class('postcard');
+    let profImg = createImg(currentProfile.currentProfileImageData).parent('postcard').class('postcard');
+  }
+}
+
+
 function setup(){
   canvas = createCanvas(640,480);
   canvas.id('canvas');
@@ -75,6 +116,7 @@ function setup(){
 
   makeBottomBar();
   makeLoginScreen();
+
 
   // initialize socket connection to server
   // socket = io.connect('https://take-the-money-and-run.herokuapp.com/');
@@ -127,6 +169,8 @@ function makeLoginScreen(){
   loginInput = createInput("login name").parent('loginScreen').class('gameControls');
   let loginButton = createButton("login").parent('loginScreen').class('gameControls');
   loginButton.mousePressed(sendLoginAttempt);
+
+
 
   //take a profile picture and set the masked areas to zero alpha
   function takeProfilePicture() {
@@ -229,6 +273,9 @@ function makeGame(){
   // TEST FOR UPDATE FUNCTIONALITY
   let saveButton = createButton("save").parent('control').class('gameControls');
   saveButton.mousePressed(updateProfile);
+
+  let postcardButton = createButton("postcard").parent('control').class('gameControls');
+  postcardButton.mousePressed(makePostcard);
 
   //
 }
