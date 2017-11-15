@@ -128,10 +128,6 @@ function makeLoginScreen(){
   let loginButton = createButton("login").parent('loginScreen').class('gameControls');
   loginButton.mousePressed(sendLoginAttempt);
 
-  //TEST FOR UPDATE FUNCTIONALITY
-  // let updateButton = createButton("update").parent('loginScreen');
-  // updateButton.mousePressed(updateProfile);
-
   //take a profile picture and set the masked areas to zero alpha
   function takeProfilePicture() {
     profilePic = webcam.get();
@@ -171,6 +167,7 @@ function makeLoginScreen(){
 
 
 function draw(){
+  clear();
   if (isLoggedIn){
     drawRoutes();
   } else{
@@ -179,7 +176,6 @@ function draw(){
 }
 
 function makePhotoBooth(){
-  clear();
   if (profilePic) {
     image(profilePic, 0, 0,640,480);
   } else {
@@ -230,35 +226,51 @@ function makeGame(){
     currentProfile.locations.push(controlInput.value());
   });
 
+  // TEST FOR UPDATE FUNCTIONALITY
+  let saveButton = createButton("save").parent('control').class('gameControls');
+  saveButton.mousePressed(updateProfile);
+
   //
-
-
 }
 
 
 
 function drawRoutes(){
-  clear();
-  //check that we have a profile...
-  if (currentProfile){
-    //iterate through all locations in current profile
-    for (let i=0;i<currentProfile.locations.length;i++){
-      let loc = currentProfile.locations[i];
-      //check through all airports for matching IATA code
-      for (let r = 0; r < airports.getRowCount(); r++) {
-        let airport = airports.getString(r, 13); //IATA Code
-        if (loc == airport){
-          let lat = airports.getString(r, 4);
-          let lng = airports.getString(r, 5);
+  //set first point for line
+  let firstAirport = currentProfile.locations[0];
+  let firstPos = getPixelCoordinates(firstAirport);
+  ellipse(firstPos.x,firstPos.y,10,10);
 
-          let pos = myMap.latLngToPixel(lat, lng);
-          fill(255);
-          ellipse(pos.x, pos.y, 5, 5);
-          break;
-        }
+  for (let i=1;i<currentProfile.locations.length;i++){
+    firstPos = getPixelCoordinates(firstAirport);
+
+    let secondAirport = currentProfile.locations[i];
+    let secondPos = getPixelCoordinates(secondAirport);
+
+    stroke(0);
+    strokeWeight(2);
+    line(firstPos.x,firstPos.y,secondPos.x,secondPos.y);
+
+    ellipse(firstPos.x,firstPos.y,10,10);
+    ellipse(secondPos.x,secondPos.y,10,10);
+
+    firstAirport = secondAirport;
+  }
+
+  // image(currentProfile.profilePicture,0,windowHeight*mapHeightScale-480,640,480);
+
+  function getPixelCoordinates(IATA){
+    //check through all airports for matching IATA code
+    for (let r = 0; r < airports.getRowCount(); r++) {
+      let airport = airports.getString(r, 13); //IATA Code
+      if (IATA == airport){
+        let lat = airports.getString(r, 4);
+        let lng = airports.getString(r, 5);
+
+        return myMap.latLngToPixel(lat, lng);
+        break;
       }
     }
-    // image(currentProfile.profilePicture,0,windowHeight*mapHeightScale-480,640,480);
   }
 }
 

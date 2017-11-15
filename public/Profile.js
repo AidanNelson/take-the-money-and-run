@@ -4,6 +4,7 @@ class Profile{
     this.budget = data.budget;
     this.locations = data.locations;
     this.profilePicture = loadImage(data.profilePicture);
+    this.currentProfileImageData = data.profilePicture;
   }
 
   forServer(){
@@ -11,7 +12,7 @@ class Profile{
       name: this.name,
       budget: this.budget,
       locations: this.locations,
-      profilePicture: p5.prototype.returnImageData(this.profilePicture)
+      profilePicture: this.currentProfileImageData
     };
   }
 
