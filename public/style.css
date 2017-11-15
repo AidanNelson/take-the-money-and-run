@@ -1,3 +1,5 @@
+
+/*import oregon trail fonts*/
 @font-face {
   font-family: 'oregon-trail';
   src: url('assets/here_lies.woff') format('woff'), /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
@@ -8,38 +10,31 @@ body {
   margin:0;
   padding:0;
   overflow: hidden;
+  background-color: white;
+
+
+  /*font globally*/
+  font-family: oregon-trail;
 }
 
 #canvas {
+  /*positioning for camera box */
   position: absolute;
   top: 10px;
   left: 50%;
   transform: translate(-50%, 0);
 }
 
-#loginScreen {
-  border:dashed;
-  z-index:20;
-  position: absolute;
-  top: 500px;
-  left: 50%;
-  transform: translate(-50%, 0);
-  width: 640px;
-  height: 140px;
-  background-color:black;
-}
-
-.login {
-  padding:4px;
-  margin:4px;
-}
-
-#control {
-  padding: 10px;
+#bottomBar {
+  /*positioning for bottom bar*/
   position:absolute;
   background-color:black;
   width:auto;
-  height:200px;
+}
+
+.gameControls {
+  padding:4px;
+  margin:4px;
+  color:grey;
   font-family: oregon-trail;
-  color: white;
 }

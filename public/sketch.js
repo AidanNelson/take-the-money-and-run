@@ -14,11 +14,10 @@ Mappa: https://github.com/cvalenzuela/Mappa
 //socket to communicate w server
 let socket;
 
-//inputs
+// login screen:
 let nameInput;
 let budgetInput;
 let locationInput;
-
 
 //html element
 let controlDiv
@@ -33,11 +32,11 @@ let airports;
 let canvas;
 let webcam;
 let mask;
-let mapHeightScale = 0.8; //division line between controls and map
+let mapHeightScale = 0.7; //division line between controls and map
 
 //
-let profilePic;
 let isLoggedIn = false;
+let profilePic;
 
 //create variables to hold the map, canvas, and "Mappa" instance
 let myMap;
@@ -55,7 +54,7 @@ let options = {
 //text
 let controlText = "Where to next?"
 
-
+let bottomBar;
 
 
 
@@ -74,6 +73,7 @@ function setup(){
   webcam.size(640, 480);
   webcam.hide();
 
+  makeBottomBar();
   makeLoginScreen();
 
   // initialize socket connection to server
@@ -88,35 +88,49 @@ function onWindowResize(){
   if (isLoggedIn){
     resizeCanvas(windowWidth, windowHeight*mapHeightScale);
   }
+  bottomBar.style('top',String(windowHeight*mapHeightScale).concat('px'));
+  bottomBar.style('height',String(windowHeight*(1-mapHeightScale)).concat('px'));
+  bottomBar.style('width',String(windowWidth).concat('px'));
+}
+
+function makeBottomBar(){
+  bottomBar = createElement('div');
+  bottomBar.id('bottomBar');
+  //put at the bottom of the screen:
+  bottomBar.style('top',String(windowHeight*mapHeightScale).concat('px'));
+  bottomBar.style('height',String(windowHeight*(1-mapHeightScale)).concat('px'));
+  bottomBar.style('width',String(windowWidth).concat('px'));
 }
 
 function makeLoginScreen(){
   let loginScreen = createElement('div');
-  loginScreen.id('loginScreen');
+  loginScreen.id('loginScreen').parent('bottomBar');
 
+  createP(loginInstructions).parent('loginScreen').class('gameControls');
   //picture taking stuff
-  let snapButton = createButton("snap").parent('loginScreen').class('login');
+  let snapButton = createButton("snap").parent('loginScreen').class('gameControls');
   snapButton.mousePressed(takeProfilePicture);
-  let resetPictureButton = createButton("reset").parent('loginScreen').class('login');
+  let resetPictureButton = createButton("reset").parent('loginScreen').class('gameControls');
   resetPictureButton.mousePressed(resetProfilePicture);
 
-  createElement('br').parent('loginScreen').class('login');
+  createElement('br').parent('loginScreen').class('gameControls');
 
-  nameInput = createInput("name").parent('loginScreen').class('login');
-  budgetInput = createInput("budget").parent('loginScreen').class('login');
-  locationInput = createInput("location").parent('loginScreen').class('login');
-  let submitButton = createButton("submit new profile").parent('loginScreen').class('login');
+  nameInput = createInput("name").parent('loginScreen').class('gameControls');
+  budgetInput = createInput("budget").parent('loginScreen').class('gameControls');
+  locationInput = createInput("location").parent('loginScreen').class('gameControls');
+  let submitButton = createButton("submit new profile").parent('loginScreen').class('gameControls');
   submitButton.mousePressed(sendNewProfile);
 
-  createElement('br').parent('loginScreen').class('login');
-  createElement('br').parent('loginScreen').class('login');
+  createElement('br').parent('loginScreen').class('gameControls');
+  createElement('br').parent('loginScreen').class('gameControls');
 
-  loginInput = createInput("login name").parent('loginScreen').class('login');
-  let loginButton = createButton("login").parent('loginScreen').class('login');
+  loginInput = createInput("login name").parent('loginScreen').class('gameControls');
+  let loginButton = createButton("login").parent('loginScreen').class('gameControls');
   loginButton.mousePressed(sendLoginAttempt);
 
-  let updateButton = createButton("update").parent('loginScreen');
-  updateButton.mousePressed(updateProfile);
+  //TEST FOR UPDATE FUNCTIONALITY
+  // let updateButton = createButton("update").parent('loginScreen');
+  // updateButton.mousePressed(updateProfile);
 
   //take a profile picture and set the masked areas to zero alpha
   function takeProfilePicture() {
@@ -158,28 +172,38 @@ function makeLoginScreen(){
 
 function draw(){
   if (isLoggedIn){
+    drawRoutes();
   } else{
-    clear();
-    if (profilePic) {
-      image(profilePic, 0, 0,640,480);
-    } else {
-      push();
-      //reverse webcam feed
-      translate(width,0);
-      scale(-1,1);
-      image(webcam, 0, 0);
-      pop();
-      image(mask, 0, 0,);
-    }
+    makePhotoBooth();
   }
 }
 
-
+function makePhotoBooth(){
+  clear();
+  if (profilePic) {
+    image(profilePic, 0, 0,640,480);
+  } else {
+    push();
+    //reverse webcam feed
+    translate(width,0);
+    scale(-1,1);
+    image(webcam, 0, 0);
+    pop();
+    image(mask, 0, 0,);
+  }
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
 function makeGame(){
+  //get rid of login box by hiding it underneath everything else
+  // select('#loginScreen').style("z-index", "-1");
+  select('#loginScreen').remove();
+  //first, get rid of the webcam
+  webcam.remove();
+  select("#old-map-image").remove();
+
   resizeCanvas(windowWidth, windowHeight*mapHeightScale);
 
   mappa = new Mappa('Leaflet');
@@ -187,26 +211,28 @@ function makeGame(){
   myMap = mappa.tileMap(options);
   myMap.overlay(canvas); //create map overlay of a canvas
   // Associate redrawMap callback function with an "onChange" event of the map
-  myMap.onChange(drawRoutes);
+  // myMap.onChange(drawRoutes);
+  isLoggedIn = true; //only log in once the map is ready
+
 
   // GAME CONTROLS
   controlDiv = createElement('div');
-  controlDiv.id('control');
+  controlDiv.id('control').parent('bottomBar');
 
   let myP = createP(controlText);
-  myP.parent('control');
+  myP.parent('control').class('gameControls');
 
   let controlInput = createInput("EWR, JFK, LAX, LHR, etc!");
-  controlInput.parent('control');
+  controlInput.parent('control').class('gameControls');
 
-  let controlButton = createButton("Go!").parent('control');
+  let controlButton = createButton("Go!").parent('control').class('gameControls');
   controlButton.mousePressed(function(){
     currentProfile.locations.push(controlInput.value());
   });
 
-  //put at the bottom of the screen:
-  controlDiv.style('top',String(windowHeight*mapHeightScale).concat('px'));
-  controlDiv.style('width',String(windowWidth).concat('px'));
+  //
+
+
 }
 
 
@@ -232,7 +258,7 @@ function drawRoutes(){
         }
       }
     }
-    image(currentProfile.profilePicture,0,windowHeight*mapHeightScale-480,640,480);
+    // image(currentProfile.profilePicture,0,windowHeight*mapHeightScale-480,640,480);
   }
 }
 
@@ -253,12 +279,6 @@ function gotLoginResponse(data){
   if (data){
     console.log("Current User: " + data.name);
     currentProfile = new Profile(data); //set currentProfile to incoming profile
-    //get rid of login box by hiding it underneath everything else
-    select('#loginScreen').style("z-index", "-1");
-
-    //get rid of image canvas and make mappa canvas...
-    isLoggedIn = true;
-    webcam.remove();
     makeGame();
   } else {
     console.log("No match. Please try again.");
@@ -284,8 +304,6 @@ function sendNewProfile(){
 function newProfileResponse(data){
   console.log(data);
 }
-
-
 
 
 //send update to server then to firebase

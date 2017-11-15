@@ -23,12 +23,13 @@ https://stackoverflow.com/questions/4647348/send-message-to-specific-client-with
 
 
 // express
+let test = require('./test');
 let express = require('express');
 let app = express();
 let server = app.listen(process.env.PORT || 3000); //set listening port
 app.use(express.static('public')); //serve up folder 'public'
 console.log("Server is running.");
-
+test.hello();
 
 
 // sockets
@@ -141,7 +142,7 @@ fbProfiles.on('value', gotProfiles, gotErr);
 
 function gotProfiles(fbData){
   console.log("Got profiles.");
-  console.log(fbData.val());
+  // console.log(fbData.val());
   if (fbData.val()) { //ensure there is some before trying to make an array
     let newProfileArray = [];
     let dbProfiles = fbData.val();
