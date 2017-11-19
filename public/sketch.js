@@ -10,6 +10,12 @@ go to work, and live out your decidedly more inhibited life.  Enjoy.
 Sources:
 Mappa: https://github.com/cvalenzuela/Mappa
 
+TO DO:
+would like to move drawRoutes into Profile, but have to figure out whether
+mappa's latLngToPixel function works outside?
+
+
+
 */
 //socket to communicate w server
 let socket;
@@ -18,9 +24,6 @@ let socket;
 let nameInput;
 let budgetInput;
 let locationInput;
-
-//html element
-let controlDiv
 
 //do we have a profiles
 let currentProfile = null;
@@ -32,7 +35,7 @@ let airports;
 let canvas;
 let webcam;
 let mask;
-let mapHeightScale = 0.7; //division line between controls and map
+let mapHeightScale = 0.7; //division line between controls and map (btwn 0 and 1)
 
 //
 let isLoggedIn = false;
@@ -41,8 +44,7 @@ let profilePic;
 //create variables to hold the map, canvas, and "Mappa" instance
 let myMap;
 let mappa;
-// options for mappa object
-let options = {
+let options = { // options for mappa object
   //set starting coordinates to NYC
   lat: 40.7128,
   lng: -73.950,
@@ -70,43 +72,6 @@ function preload(){
 }
 
 
-function makePostcard() {
-  let iata = currentProfile.locations[currentProfile.locations.length-1];
-  console.log('make postcard of ' + iata);
-
-
-  for (var r = 0; r < airports.getRowCount(); r++) {
-    if (airports.getString(r, 14) == iata){
-      console.log('found airport');
-      let city = airports.getString(r,10);
-      let searchWord = city;
-      let flickrAPI = "https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=43d46d0671093b54323ba9147cc4cc11&tags=" + searchWord + "&per_page=10&format=json&nojsoncallback=1";
-      loadJSON(flickrAPI, displayRandomImage);
-
-    }
-  }
-
-  function displayRandomImage(jsonData){
-    let urls = [];
-    for (var i = 0 ; i < 10 ; i++ ) {
-      let server = jsonData.photos.photo[i].server;
-      let secret = jsonData.photos.photo[i].secret;
-      let id = jsonData.photos.photo[i].id;
-
-      let newUrl  = "https://farm1.staticflickr.com/" + server + "/" + id + "_" + secret + "_b.jpg";
-      urls.push(newUrl);
-      console.log(newUrl);
-    }
-    console.log(urls);
-
-    let pcDiv = createElement('div');
-    pcDiv.id('postcard');
-    let bgImg = createImg(urls[floor(random(urls.length))]).parent('postcard').class('postcard');
-    let profImg = createImg(currentProfile.currentProfileImageData).parent('postcard').class('postcard');
-  }
-}
-
-
 function setup(){
   canvas = createCanvas(640,480);
   canvas.id('canvas');
@@ -116,7 +81,6 @@ function setup(){
 
   makeBottomBar();
   makeLoginScreen();
-
 
   // initialize socket connection to server
   // socket = io.connect('https://take-the-money-and-run.herokuapp.com/');
@@ -149,6 +113,7 @@ function makeLoginScreen(){
   loginScreen.id('loginScreen').parent('bottomBar');
 
   createP(loginInstructions).parent('loginScreen').class('gameControls');
+
   //picture taking stuff
   let snapButton = createButton("snap").parent('loginScreen').class('gameControls');
   snapButton.mousePressed(takeProfilePicture);
@@ -237,10 +202,8 @@ function makePhotoBooth(){
 ////////////////////////////////////////////////////////////////////////////////
 
 function makeGame(){
-  //get rid of login box by hiding it underneath everything else
-  // select('#loginScreen').style("z-index", "-1");
+  //get rid of login screen div, webcam and map
   select('#loginScreen').remove();
-  //first, get rid of the webcam
   webcam.remove();
   select("#old-map-image").remove();
 
@@ -256,13 +219,13 @@ function makeGame(){
 
 
   // GAME CONTROLS
-  controlDiv = createElement('div');
+  let controlDiv = createElement('div');
   controlDiv.id('control').parent('bottomBar');
 
   let myP = createP(controlText);
   myP.parent('control').class('gameControls');
 
-  let controlInput = createInput("EWR, JFK, LAX, LHR, etc!");
+  let controlInput = createInput("JFK, LAX, LHR, etc!");
   controlInput.parent('control').class('gameControls');
 
   let controlButton = createButton("Go!").parent('control').class('gameControls');
@@ -277,9 +240,45 @@ function makeGame(){
   let postcardButton = createButton("postcard").parent('control').class('gameControls');
   postcardButton.mousePressed(makePostcard);
 
+
   //
 }
 
+
+function makePostcard() {
+  let iata = currentProfile.locations[currentProfile.locations.length-1];
+  // console.log('Make postcard of ' + iata);
+
+
+  for (var r = 0; r < airports.getRowCount(); r++) {
+    if (airports.getString(r, 14) == iata){
+      console.log('found airport');
+      let city = airports.getString(r,10);
+      let searchWord = city;
+      let flickrAPI = "https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=43d46d0671093b54323ba9147cc4cc11&tags=" + searchWord + "&per_page=10&format=json&nojsoncallback=1";
+      loadJSON(flickrAPI, displayRandomImage);
+    }
+  }
+
+  function displayRandomImage(jsonData){
+    let urls = [];
+    for (var i = 0 ; i < 10 ; i++ ) {
+      let server = jsonData.photos.photo[i].server;
+      let secret = jsonData.photos.photo[i].secret;
+      let id = jsonData.photos.photo[i].id;
+
+      let newUrl  = "https://farm1.staticflickr.com/" + server + "/" + id + "_" + secret + "_b.jpg";
+      urls.push(newUrl);
+      console.log(newUrl);
+    }
+    console.log(urls);
+
+    let pcDiv = createElement('div');
+    pcDiv.id('postcard');
+    let bgImg = createImg(urls[floor(random(urls.length))]).parent('postcard').class('postcard');
+    let profImg = createImg(currentProfile.currentProfileImageData).parent('postcard').class('postcard');
+  }
+}
 
 
 function drawRoutes(){
