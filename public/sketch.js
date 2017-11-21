@@ -76,7 +76,7 @@ let helloText;
 
 //div for all controls
 let bottomBar;
-
+let song;
 
 
 
@@ -91,6 +91,7 @@ function preload(){
   isoToCountry = loadJSON(dkkToDenmark);
   currencyInWorld = loadJSON(countryCurrency);
   helloText = loadTable("assets/hello4.txt", "tsv");
+  song = loadSound("assets/song.mp3");
 }
 
 
@@ -100,6 +101,9 @@ function setup(){
   webcam = createCapture(VIDEO);
   webcam.size(640, 480);
   webcam.hide();
+
+  song.setVolume(0.1);
+  song.play();
 
   makeBottomBar();
   makeLoginScreen();
