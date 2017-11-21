@@ -51,8 +51,11 @@ body {
   width: 640px;
   height: 480px;
   z-index: 999999;
-  color:white;
+  -webkit-text-stroke-width: 1px;
+   -webkit-text-stroke-color: black;
+  color:yellow;
   padding:10px;
+  font-size: 14px;
 }
 
 #profileImage{

@@ -67,6 +67,11 @@ let controlInput
 let controlText = "Where to next?"
 let loginResponse;
 let gameResponse;
+let helloText;
+
+// let countryName;
+// let countryInfo;
+// let currency;
 
 
 //div for all controls
@@ -85,6 +90,7 @@ function preload(){
   countryInfo = loadJSON(cInfo);
   isoToCountry = loadJSON(dkkToDenmark);
   currencyInWorld = loadJSON(countryCurrency);
+  helloText = loadTable("assets/hello4.txt", "tsv");
 }
 
 
@@ -316,10 +322,37 @@ function makePostcard() {
     let profImg = createImg(currentProfile.currentProfileImageData).parent('postcard').class('postcard');
     profImg.id("profileImage");
 
+
+    let localHello = getLocalHello(iso);
+
+    function getLocalHello(iso){
+      let hello = "hello";
+      for (let r=0;r<helloText.getRowCount();r++){
+        // console.log('checking ' + helloText.getString(r,0) + " against " + iso);
+        if (helloText.getString(r,0)==iso){
+          hello  =  helloText.getString(r,2);
+          console.log(hello);
+        }
+      }
+      return hello;
+    }
+    console.log(localHello);
+
     let countryName = convertIsoToCountry(iso);
     let countryInfo = countryToInformation(countryName);
     let currency = countryToCurrency(countryName);
-    let postcardText = createP("Hello from " + countryName + " \n If you don't know where it is it's " + countryInfo + "\nHope all is well \nI spend " + currency + " all the time!");
+
+    let p1 = localHello + " from " + countryName + " \n If you don't know where it is it's " + countryInfo + "\nHope all is well \nI spend " + currency + " all the time!";
+    let p2 = localHello + " from the land of " + countryName + "!  A pigeon alighted upon my finger this evening and tied to its foot was a small bundle of " + currency + "!  What a world is " + countryInfo + "! - " + currentProfile.name;
+    let p3 = "Three words, and then silence.  A poet is only as good as the " + currency + " in his pocket.  Luckily, " + countryName + " has welcomed me with open arms and the " + countryInfo + " is a place to behold.  "+ localHello + " ever Yours, " + currentProfile.name;
+    let p4 = localHello + " my friend! Through these many days of wandering, " + countryName + " has proved a gem. XOXO, "+ currentProfile.name;
+    let p5 = localHello + " from an old fool!  In " + countryName + " I have found my greatest love.  I have forgone " + currency + " and am finally, unequicicably me: " + currentProfile.name;
+    let postcardTemplates = [p1,p2,p3,p4,p5];
+    console.log(localHello);
+    let postcardText = createP(postcardTemplates[floor(random(postcardTemplates.length))]);
+
+    console.log(postcardText);
+
     postcardText.parent('postcard').class('postcard');
   }
 }
