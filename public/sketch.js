@@ -14,6 +14,14 @@ TO DO:
 would like to move drawRoutes into Profile, but have to figure out whether
 mappa's latLngToPixel function works outside?
 
+how to update dom P element?
+
+returning isotocountry returns object rather than string??
+
+getting length of json arranges in these ways
+
+how to parse text
+how to make a big change in code
 
 
 */
@@ -54,7 +62,12 @@ let options = { // options for mappa object
 }
 
 //text
+
+let controlInput
 let controlText = "Where to next?"
+let loginResponse;
+let gameResponse;
+
 
 //div for all controls
 let bottomBar;
@@ -69,6 +82,9 @@ let bottomBar;
 function preload(){
   airports = loadTable("assets/airports.txt","csv","header");
   mask = loadImage("assets/mask.png");
+  countryInfo = loadJSON(cInfo);
+  isoToCountry = loadJSON(dkkToDenmark);
+  currencyInWorld = loadJSON(countryCurrency);
 }
 
 
@@ -134,6 +150,9 @@ function makeLoginScreen(){
   loginInput = createInput("login name").parent('loginScreen').class('gameControls');
   let loginButton = createButton("login").parent('loginScreen').class('gameControls');
   loginButton.mousePressed(sendLoginAttempt);
+
+  loginResponse = createP("login response").parent('loginScreen').class('gameControls');
+
 
 
 
@@ -225,13 +244,11 @@ function makeGame(){
   let myP = createP(controlText);
   myP.parent('control').class('gameControls');
 
-  let controlInput = createInput("JFK, LAX, LHR, etc!");
+  controlInput = createInput("JFK, LAX, LHR, etc!");
   controlInput.parent('control').class('gameControls');
 
-  let controlButton = createButton("Go!").parent('control').class('gameControls');
-  controlButton.mousePressed(function(){
-    currentProfile.locations.push(controlInput.value());
-  });
+  let goButton = createButton("Go!").parent('control').class('gameControls');
+  goButton.mousePressed(addGoodAirports);
 
   // TEST FOR UPDATE FUNCTIONALITY
   let saveButton = createButton("save").parent('control').class('gameControls');
@@ -239,22 +256,41 @@ function makeGame(){
 
   let postcardButton = createButton("postcard").parent('control').class('gameControls');
   postcardButton.mousePressed(makePostcard);
+  let closePostcardButton = createButton("close postcard").parent('control').class('gameControls');
+  closePostcardButton.mousePressed(closePostcard);
 
+  gameResponse = createP("game response").parent('control').class('gameControls');
 
   //
+}
+
+function addGoodAirports(){
+  let toCheck = controlInput.value();
+  console.log('looking for airport: ' + toCheck);
+  for (var r = 0; r < airports.getRowCount(); r++) {
+    if (airports.getString(r, 13) == toCheck){
+      console.log('found airport');
+      currentProfile.locations.push(toCheck);
+      break;
+    }
+  }
 }
 
 
 function makePostcard() {
   let iata = currentProfile.locations[currentProfile.locations.length-1];
+  let iso;
   // console.log('Make postcard of ' + iata);
 
 
   for (var r = 0; r < airports.getRowCount(); r++) {
-    if (airports.getString(r, 14) == iata){
+    if (airports.getString(r, 13) == iata){
+      iso = airports.getString(r,8);
       console.log('found airport');
       let city = airports.getString(r,10);
-      let searchWord = city;
+      let searchList = ["beach" , "skyline" , "nightlife" , "monument" , "fashion" , "Bar" ];
+      let searchWord = city + " " + searchList[floor(random(searchList.length))];
+      console.log('your search is for: ' + " " + searchWord);
       let flickrAPI = "https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=43d46d0671093b54323ba9147cc4cc11&tags=" + searchWord + "&per_page=10&format=json&nojsoncallback=1";
       loadJSON(flickrAPI, displayRandomImage);
     }
@@ -273,13 +309,24 @@ function makePostcard() {
     }
     console.log(urls);
 
+
     let pcDiv = createElement('div');
     pcDiv.id('postcard');
     let bgImg = createImg(urls[floor(random(urls.length))]).parent('postcard').class('postcard');
     let profImg = createImg(currentProfile.currentProfileImageData).parent('postcard').class('postcard');
+    profImg.id("profileImage");
+
+    let countryName = convertIsoToCountry(iso);
+    let countryInfo = countryToInformation(countryName);
+    let currency = countryToCurrency(countryName);
+    let postcardText = createP("Hello from " + countryName + " \n If you don't know where it is it's " + countryInfo + "\nHope all is well \nI spend " + currency + " all the time!");
+    postcardText.parent('postcard').class('postcard');
   }
 }
 
+function closePostcard(){
+  select('#postcard').remove();
+}
 
 function drawRoutes(){
   //set first point for line
@@ -296,7 +343,6 @@ function drawRoutes(){
     stroke(0);
     strokeWeight(2);
     line(firstPos.x,firstPos.y,secondPos.x,secondPos.y);
-
     ellipse(firstPos.x,firstPos.y,10,10);
     ellipse(secondPos.x,secondPos.y,10,10);
 
@@ -340,6 +386,7 @@ function gotLoginResponse(data){
     makeGame();
   } else {
     console.log("No match. Please try again.");
+    loginResponse.value("no match found.");
     currentProfile = false;
   }
 }
