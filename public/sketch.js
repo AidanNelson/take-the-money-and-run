@@ -109,8 +109,8 @@ function setup(){
   makeLoginScreen();
 
   // initialize socket connection to server
-  // socket = io.connect('https://take-the-money-and-run.herokuapp.com/');
-  socket = io.connect('http://localhost:3000');
+  socket = io.connect('https://take-the-money-and-run.herokuapp.com/');
+  // socket = io.connect('http://localhost:3000');
   socket.on('login', gotLoginResponse);
   socket.on('newProfile',newProfileResponse);
 }
