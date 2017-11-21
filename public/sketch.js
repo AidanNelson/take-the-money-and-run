@@ -14,6 +14,14 @@ TO DO:
 would like to move drawRoutes into Profile, but have to figure out whether
 mappa's latLngToPixel function works outside?
 
+how to update dom P element?
+
+returning isotocountry returns object rather than string??
+
+getting length of json arranges in these ways
+
+how to parse text
+how to make a big change in code
 
 
 */
@@ -54,11 +62,21 @@ let options = { // options for mappa object
 }
 
 //text
+
+let controlInput
 let controlText = "Where to next?"
+let loginResponse;
+let gameResponse;
+let helloText;
+
+// let countryName;
+// let countryInfo;
+// let currency;
+
 
 //div for all controls
 let bottomBar;
-
+let song;
 
 
 
@@ -69,6 +87,11 @@ let bottomBar;
 function preload(){
   airports = loadTable("assets/airports.txt","csv","header");
   mask = loadImage("assets/mask.png");
+  countryInfo = loadJSON(cInfo);
+  isoToCountry = loadJSON(dkkToDenmark);
+  currencyInWorld = loadJSON(countryCurrency);
+  helloText = loadTable("assets/hello4.txt", "tsv");
+  song = loadSound("assets/song.mp3");
 }
 
 
@@ -78,6 +101,9 @@ function setup(){
   webcam = createCapture(VIDEO);
   webcam.size(640, 480);
   webcam.hide();
+
+  song.setVolume(0.1);
+  song.play();
 
   makeBottomBar();
   makeLoginScreen();
@@ -134,6 +160,9 @@ function makeLoginScreen(){
   loginInput = createInput("login name").parent('loginScreen').class('gameControls');
   let loginButton = createButton("login").parent('loginScreen').class('gameControls');
   loginButton.mousePressed(sendLoginAttempt);
+
+  loginResponse = createP("login response").parent('loginScreen').class('gameControls');
+
 
 
 
@@ -225,35 +254,57 @@ function makeGame(){
   let myP = createP(controlText);
   myP.parent('control').class('gameControls');
 
-  let controlInput = createInput("JFK, LAX, LHR, etc!");
+  controlInput = createInput("JFK, LAX, LHR, etc!");
   controlInput.parent('control').class('gameControls');
 
-  let controlButton = createButton("Go!").parent('control').class('gameControls');
-  controlButton.mousePressed(function(){
-    currentProfile.locations.push(controlInput.value());
-  });
+  let goButton = createButton("Go!").parent('control').class('gameControls');
+  goButton.mousePressed(addGoodAirports);
 
   // TEST FOR UPDATE FUNCTIONALITY
   let saveButton = createButton("save").parent('control').class('gameControls');
   saveButton.mousePressed(updateProfile);
 
   let postcardButton = createButton("postcard").parent('control').class('gameControls');
+<<<<<<< HEAD
   postcardButton.mousePressed(makePostcardTwo);
   // postcardButton.id("postcardButton");
+=======
+  postcardButton.mousePressed(makePostcard);
+  let closePostcardButton = createButton("close postcard").parent('control').class('gameControls');
+  closePostcardButton.mousePressed(closePostcard);
+
+  gameResponse = createP("game response").parent('control').class('gameControls');
+>>>>>>> c7d592b0da64e9b4a3082d566a48cdad33d5ea80
 
   //
+}
+
+function addGoodAirports(){
+  let toCheck = controlInput.value();
+  console.log('looking for airport: ' + toCheck);
+  for (var r = 0; r < airports.getRowCount(); r++) {
+    if (airports.getString(r, 13) == toCheck){
+      console.log('found airport');
+      currentProfile.locations.push(toCheck);
+      break;
+    }
+  }
 }
 
 
 function makePostcard() {
   let iata = currentProfile.locations[currentProfile.locations.length-1];
+  let iso;
   // console.log('Make postcard of ' + iata);
 
   for (var r = 0; r < airports.getRowCount(); r++) {
-    if (airports.getString(r, 14) == iata){
+    if (airports.getString(r, 13) == iata){
+      iso = airports.getString(r,8);
       console.log('found airport');
       let city = airports.getString(r,10);
-      let searchWord = city;
+      let searchList = ["beach" , "skyline" , "nightlife" , "monument" , "fashion" , "Bar" ];
+      let searchWord = city + " " + searchList[floor(random(searchList.length))];
+      console.log('your search is for: ' + " " + searchWord);
       let flickrAPI = "https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=43d46d0671093b54323ba9147cc4cc11&tags=" + searchWord + "&per_page=10&format=json&nojsoncallback=1";
       loadJSON(flickrAPI, displayRandomImage);
     }
@@ -272,14 +323,55 @@ function makePostcard() {
     }
     console.log(urls);
 
+<<<<<<< HEAD
     let pcDiv = createElement('div').id('postcard');
     // let closeB = createButton('close').parent('postcard').class('postcard');
     // closeB.mousePressed(removePostcard);
+=======
+
+    let pcDiv = createElement('div');
+    pcDiv.id('postcard');
+>>>>>>> c7d592b0da64e9b4a3082d566a48cdad33d5ea80
     let bgImg = createImg(urls[floor(random(urls.length))]).parent('postcard').class('postcard');
     let profImg = createImg(currentProfile.currentProfileImageData).parent('postcard').class('postcard');
+    profImg.id("profileImage");
+
+
+    let localHello = getLocalHello(iso);
+
+    function getLocalHello(iso){
+      let hello = "hello";
+      for (let r=0;r<helloText.getRowCount();r++){
+        // console.log('checking ' + helloText.getString(r,0) + " against " + iso);
+        if (helloText.getString(r,0)==iso){
+          hello  =  helloText.getString(r,2);
+          console.log(hello);
+        }
+      }
+      return hello;
+    }
+    console.log(localHello);
+
+    let countryName = convertIsoToCountry(iso);
+    let countryInfo = countryToInformation(countryName);
+    let currency = countryToCurrency(countryName);
+
+    let p1 = localHello + " from " + countryName + " \n If you don't know where it is it's " + countryInfo + "\nHope all is well \nI spend " + currency + " all the time!";
+    let p2 = localHello + " from the land of " + countryName + "!  A pigeon alighted upon my finger this evening and tied to its foot was a small bundle of " + currency + "!  What a world is " + countryInfo + "! - " + currentProfile.name;
+    let p3 = "Three words, and then silence.  A poet is only as good as the " + currency + " in his pocket.  Luckily, " + countryName + " has welcomed me with open arms and the " + countryInfo + " is a place to behold.  "+ localHello + " ever Yours, " + currentProfile.name;
+    let p4 = localHello + " my friend! Through these many days of wandering, " + countryName + " has proved a gem. XOXO, "+ currentProfile.name;
+    let p5 = localHello + " from an old fool!  In " + countryName + " I have found my greatest love.  I have forgone " + currency + " and am finally, unequicicably me: " + currentProfile.name;
+    let postcardTemplates = [p1,p2,p3,p4,p5];
+    console.log(localHello);
+    let postcardText = createP(postcardTemplates[floor(random(postcardTemplates.length))]);
+
+    console.log(postcardText);
+
+    postcardText.parent('postcard').class('postcard');
   }
 }
 
+<<<<<<< HEAD
 // function removePostcard(){
 //   select('#postcard').remove();
 // }
@@ -336,6 +428,10 @@ function makePostcardTwo(){
   		modal.style.display = "none";
   	}
   }
+=======
+function closePostcard(){
+  select('#postcard').remove();
+>>>>>>> c7d592b0da64e9b4a3082d566a48cdad33d5ea80
 }
 
 function drawRoutes(){
@@ -353,7 +449,6 @@ function drawRoutes(){
     stroke(0);
     strokeWeight(2);
     line(firstPos.x,firstPos.y,secondPos.x,secondPos.y);
-
     ellipse(firstPos.x,firstPos.y,10,10);
     ellipse(secondPos.x,secondPos.y,10,10);
 
@@ -397,6 +492,7 @@ function gotLoginResponse(data){
     makeGame();
   } else {
     console.log("No match. Please try again.");
+    loginResponse.value("no match found.");
     currentProfile = false;
   }
 }
