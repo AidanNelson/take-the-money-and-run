@@ -265,16 +265,11 @@ function makeGame(){
   saveButton.mousePressed(updateProfile);
 
   let postcardButton = createButton("postcard").parent('control').class('gameControls');
-<<<<<<< HEAD
-  postcardButton.mousePressed(makePostcardTwo);
-  // postcardButton.id("postcardButton");
-=======
   postcardButton.mousePressed(makePostcard);
   let closePostcardButton = createButton("close postcard").parent('control').class('gameControls');
   closePostcardButton.mousePressed(closePostcard);
 
   gameResponse = createP("game response").parent('control').class('gameControls');
->>>>>>> c7d592b0da64e9b4a3082d566a48cdad33d5ea80
 
   //
 }
@@ -323,15 +318,9 @@ function makePostcard() {
     }
     console.log(urls);
 
-<<<<<<< HEAD
-    let pcDiv = createElement('div').id('postcard');
-    // let closeB = createButton('close').parent('postcard').class('postcard');
-    // closeB.mousePressed(removePostcard);
-=======
 
     let pcDiv = createElement('div');
     pcDiv.id('postcard');
->>>>>>> c7d592b0da64e9b4a3082d566a48cdad33d5ea80
     let bgImg = createImg(urls[floor(random(urls.length))]).parent('postcard').class('postcard');
     let profImg = createImg(currentProfile.currentProfileImageData).parent('postcard').class('postcard');
     profImg.id("profileImage");
@@ -371,67 +360,8 @@ function makePostcard() {
   }
 }
 
-<<<<<<< HEAD
-// function removePostcard(){
-//   select('#postcard').remove();
-// }
-
-function makePostcardTwo(){
-  let iata = currentProfile.locations[currentProfile.locations.length-1];
-  // console.log('Make postcard of ' + iata);
-
-  for (var r = 0; r < airports.getRowCount(); r++) {
-    if (airports.getString(r, 14) == iata){
-      console.log('found airport');
-      let city = airports.getString(r,10);
-      let searchWord = city;
-      let flickrAPI = "https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=43d46d0671093b54323ba9147cc4cc11&tags=" + searchWord + "&per_page=10&format=json&nojsoncallback=1";
-      loadJSON(flickrAPI, displayRandomImage);
-    }
-  }
-
-  function displayRandomImage(jsonData){
-    let urls = [];
-    for (var i = 0 ; i < 10 ; i++ ) {
-      let server = jsonData.photos.photo[i].server;
-      let secret = jsonData.photos.photo[i].secret;
-      let id = jsonData.photos.photo[i].id;
-
-      let newUrl  = "https://farm1.staticflickr.com/" + server + "/" + id + "_" + secret + "_b.jpg";
-      urls.push(newUrl);
-      console.log(newUrl);
-    }
-    console.log(urls);
-
-    // let pcDiv = createElement('div').id('postcard');
-    // // let closeB = createButton('close').parent('postcard').class('postcard');
-    // // closeB.mousePressed(removePostcard);
-    // let bgImg = createImg(urls[floor(random(urls.length))]).parent('postcard').class('postcard');
-    // let profImg = createImg(currentProfile.currentProfileImageData).parent('postcard').class('postcard');
-
-    // Get the modal
-  	var modal = document.getElementById('postcardModal');
-
-  	// Get the image and insert it inside the modal - use its "alt" text as a caption
-  	// var img = document.getElementById('postcardButton');
-    var img = createImg(urls[floor(random(urls.length))]).id('img');
-  	var modalImg = document.getElementById("img01");
-  	var captionText = document.getElementById("caption");
-    modal.style.display = "block";
-    modalImg.src = img.src;
-    // captionText.innerHTML = this.alt;
-
-  	// Get the <span> element that closes the modal
-  	var span = document.getElementsByClassName("close")[0];
-  	// When the user clicks on <span> (x), close the modal
-  	span.onclick = function() {
-  		modal.style.display = "none";
-  	}
-  }
-=======
 function closePostcard(){
   select('#postcard').remove();
->>>>>>> c7d592b0da64e9b4a3082d566a48cdad33d5ea80
 }
 
 function drawRoutes(){
