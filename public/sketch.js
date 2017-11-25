@@ -96,8 +96,6 @@ function preload(){
 
 
 function setup(){
-
-
   // song.setVolume(0.1);
   // song.play();
 
@@ -156,8 +154,8 @@ function makeLoginScreen(){
   locationInput.id("locationAutocomplete");
   //jQuery autocomplete for locations...
   $( "#locationAutocomplete" ).autocomplete({
-  source: airports.getColumn('municipality')
-});
+    source: airports.getColumn('municipality')
+  });
   let submitButton = createButton("submit new profile").parent('loginScreen').class('gameControls');
   submitButton.mousePressed(sendNewProfile);
 
@@ -194,7 +192,6 @@ function makeLoginScreen(){
     profilePic.updatePixels();
     console.log('Nice pic!');
     document.getElementById('loginResponse').innerHTML = 'Great pic!';
-    // save(profilePic,"myImg.png");
   }
 
   function resetProfilePicture() {
@@ -215,7 +212,7 @@ function makeLoginScreen(){
 function draw(){
   clear();
   if (isLoggedIn){
-    drawRoutes();
+    // drawRoutes();
   } else{
     makePhotoBooth();
   }
@@ -251,9 +248,9 @@ function makeGame(){
   myMap = mappa.tileMap(options);
   myMap.overlay(canvas); //create map overlay of a canvas
   // Associate redrawMap callback function with an "onChange" event of the map
-  // myMap.onChange(drawRoutes);
+  myMap.onChange(drawRoutes);
   isLoggedIn = true; //only log in once the map is ready
-
+  drawRoutes();
 
   // GAME CONTROLS
   let controlDiv = createElement('div');
