@@ -52,14 +52,7 @@ let profilePic;
 //create variables to hold the map, canvas, and "Mappa" instance
 let myMap;
 let mappa;
-let options = { // options for mappa object
-  //set starting coordinates to NYC
-  lat: 40.7128,
-  lng: -73.950,
-  //set zoom level
-  zoom: 3,
-  style: "http://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png"
-}
+
 
 //text
 
@@ -85,7 +78,7 @@ let song;
 ////////////////////////////////////////////////////////////////////////////////
 
 function preload(){
-  airports = loadTable("assets/airports.txt","csv","header");
+  airports = loadTable("assets/airports_no_duplicates.txt","csv","header");
   mask = loadImage("assets/mask.png");
   countryInfo = loadJSON(cInfo);
   isoToCountry = loadJSON(dkkToDenmark);
@@ -210,27 +203,29 @@ function makeLoginScreen(){
 
 
 function draw(){
-  clear();
-  if (isLoggedIn){
-    // drawRoutes();
-  } else{
+
+  if (!isLoggedIn){
     makePhotoBooth();
+  }
+
+  function makePhotoBooth(){
+    clear();
+    if (profilePic) {
+      image(profilePic, 0, 0,640,480);
+    } else {
+      push();
+      //reverse webcam feed
+      translate(width,0);
+      scale(-1,1);
+      image(webcam, 0, 0);
+      pop();
+      image(mask, 0, 0,);
+    }
   }
 }
 
-function makePhotoBooth(){
-  if (profilePic) {
-    image(profilePic, 0, 0,640,480);
-  } else {
-    push();
-    //reverse webcam feed
-    translate(width,0);
-    scale(-1,1);
-    image(webcam, 0, 0);
-    pop();
-    image(mask, 0, 0,);
-  }
-}
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -243,6 +238,31 @@ function makeGame(){
 
   resizeCanvas(windowWidth, windowHeight*mapHeightScale);
 
+
+  //start the mappa on the latest location's coordinates
+  let currentCity = currentProfile.locations[currentProfile.locations.length-1];
+  let currentLoc = {
+    lat:0,
+    lng:0
+  };
+  for (var r = 0; r < airports.getRowCount(); r++) {
+    if (airports.getString(r, 10) == currentCity){
+      let lat = airports.getString(r, 4);
+      let lng = airports.getString(r, 5);
+      currentLoc.lat = lat;
+      currentLoc.lng = lng;
+    }
+  }
+
+
+  let options = { // options for mappa object
+    //set starting coordinates to NYC
+    lat: currentLoc.lat,
+    lng: currentLoc.lng,
+    //set zoom level
+    zoom: 3,
+    style: "http://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png"
+  }
   mappa = new Mappa('Leaflet');
   //call mappa object to create a tilemap at lat,long, zoom level
   myMap = mappa.tileMap(options);
@@ -250,7 +270,7 @@ function makeGame(){
   // Associate redrawMap callback function with an "onChange" event of the map
   myMap.onChange(drawRoutes);
   isLoggedIn = true; //only log in once the map is ready
-  drawRoutes();
+  setTimeout(drawRoutes, 2000);
 
   // GAME CONTROLS
   let controlDiv = createElement('div');
@@ -259,8 +279,12 @@ function makeGame(){
   let myP = createP(controlText);
   myP.parent('control').class('gameControls');
 
-  controlInput = createInput("JFK, LAX, LHR, etc!");
+  controlInput = createInput("Beijing, etc.");
   controlInput.parent('control').class('gameControls');
+  controlInput.id('controlInput');
+  $( "#controlInput" ).autocomplete({
+    source: airports.getColumn('municipality')
+  });
 
   let goButton = createButton("Go!").parent('control').class('gameControls');
   goButton.mousePressed(addGoodAirports);
@@ -283,9 +307,10 @@ function addGoodAirports(){
   let toCheck = controlInput.value();
   console.log('looking for airport: ' + toCheck);
   for (var r = 0; r < airports.getRowCount(); r++) {
-    if (airports.getString(r, 13) == toCheck){
+    if (airports.getString(r, 10) == toCheck){
       console.log('found airport');
       currentProfile.locations.push(toCheck);
+      drawRoutes();
       break;
     }
   }
@@ -298,7 +323,7 @@ function makePostcard() {
   // console.log('Make postcard of ' + iata);
 
   for (var r = 0; r < airports.getRowCount(); r++) {
-    if (airports.getString(r, 13) == iata){
+    if (airports.getString(r, 10) == iata){
       iso = airports.getString(r,8);
       console.log('found airport');
       let city = airports.getString(r,10);
@@ -370,6 +395,7 @@ function closePostcard(){
 }
 
 function drawRoutes(){
+  clear();
   //set first point for line
   let firstAirport = currentProfile.locations[0];
   let firstPos = getPixelCoordinates(firstAirport);
@@ -395,7 +421,7 @@ function drawRoutes(){
   function getPixelCoordinates(IATA){
     //check through all airports for matching IATA code
     for (let r = 0; r < airports.getRowCount(); r++) {
-      let airport = airports.getString(r, 13); //IATA Code
+      let airport = airports.getString(r, 10); //IATA Code
       if (IATA == airport){
         let lat = airports.getString(r, 4);
         let lng = airports.getString(r, 5);
