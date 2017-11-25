@@ -91,26 +91,22 @@ function preload(){
   isoToCountry = loadJSON(dkkToDenmark);
   currencyInWorld = loadJSON(countryCurrency);
   helloText = loadTable("assets/hello4.txt", "tsv");
-  song = loadSound("assets/song.mp3");
+  // song = loadSound("assets/song.mp3");
 }
 
 
 function setup(){
-  canvas = createCanvas(640,480);
-  canvas.id('canvas');
-  webcam = createCapture(VIDEO);
-  webcam.size(640, 480);
-  webcam.hide();
 
-  song.setVolume(0.1);
-  song.play();
+
+  // song.setVolume(0.1);
+  // song.play();
 
   makeBottomBar();
   makeLoginScreen();
 
   // initialize socket connection to server
-  socket = io.connect('https://take-the-money-and-run.herokuapp.com/');
-  // socket = io.connect('http://localhost:3000');
+  // socket = io.connect('https://take-the-money-and-run.herokuapp.com/');
+  socket = io.connect('http://localhost:3000');
   socket.on('login', gotLoginResponse);
   socket.on('newProfile',newProfileResponse);
 }
@@ -135,6 +131,12 @@ function makeBottomBar(){
 }
 
 function makeLoginScreen(){
+  canvas = createCanvas(640,480);
+  canvas.id('canvas');
+  webcam = createCapture(VIDEO);
+  webcam.size(640, 480);
+  webcam.hide();
+
   let loginScreen = createElement('div');
   loginScreen.id('loginScreen').parent('bottomBar');
 
@@ -151,6 +153,11 @@ function makeLoginScreen(){
   nameInput = createInput("name").parent('loginScreen').class('gameControls');
   budgetInput = createInput("budget").parent('loginScreen').class('gameControls');
   locationInput = createInput("location").parent('loginScreen').class('gameControls');
+  locationInput.id("locationAutocomplete");
+  //jQuery autocomplete for locations...
+  $( "#locationAutocomplete" ).autocomplete({
+  source: airports.getColumn('municipality')
+});
   let submitButton = createButton("submit new profile").parent('loginScreen').class('gameControls');
   submitButton.mousePressed(sendNewProfile);
 
@@ -161,8 +168,8 @@ function makeLoginScreen(){
   let loginButton = createButton("login").parent('loginScreen').class('gameControls');
   loginButton.mousePressed(sendLoginAttempt);
 
-  loginResponse = createP("login response").parent('loginScreen').class('gameControls');
-
+  loginResponse = createP("").parent('loginScreen').class('gameControls');
+  loginResponse.id('loginResponse');
 
 
 
@@ -186,6 +193,7 @@ function makeLoginScreen(){
     }
     profilePic.updatePixels();
     console.log('Nice pic!');
+    document.getElementById('loginResponse').innerHTML = 'Great pic!';
     // save(profilePic,"myImg.png");
   }
 
@@ -422,7 +430,7 @@ function gotLoginResponse(data){
     makeGame();
   } else {
     console.log("No match. Please try again.");
-    loginResponse.value("no match found.");
+    document.getElementById('loginResponse').innerHTML = "no match found.";
     currentProfile = false;
   }
 }
