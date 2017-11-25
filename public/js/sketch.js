@@ -236,6 +236,8 @@ function makeGame(){
   webcam.remove();
   select("#old-map-image").remove();
 
+  isLoggedIn = true; //only log in once the map is ready
+
   resizeCanvas(windowWidth, windowHeight*mapHeightScale);
 
 
@@ -268,9 +270,11 @@ function makeGame(){
   myMap = mappa.tileMap(options);
   myMap.overlay(canvas); //create map overlay of a canvas
   // Associate redrawMap callback function with an "onChange" event of the map
-  myMap.onChange(drawRoutes);
-  isLoggedIn = true; //only log in once the map is ready
-  setTimeout(drawRoutes, 2000);
+  myMap.onChange(function(){
+    currentProfile.drawRoutes();
+  });
+
+  setTimeout(currentProfile.drawRoutes,2000);
 
   // GAME CONTROLS
   let controlDiv = createElement('div');
@@ -310,7 +314,7 @@ function addGoodAirports(){
     if (airports.getString(r, 10) == toCheck){
       console.log('found airport');
       currentProfile.locations.push(toCheck);
-      drawRoutes();
+      currentProfile.drawRoutes();
       break;
     }
   }
@@ -392,45 +396,6 @@ function makePostcard() {
 
 function closePostcard(){
   select('#postcard').remove();
-}
-
-function drawRoutes(){
-  clear();
-  //set first point for line
-  let firstAirport = currentProfile.locations[0];
-  let firstPos = getPixelCoordinates(firstAirport);
-  ellipse(firstPos.x,firstPos.y,10,10);
-
-  for (let i=1;i<currentProfile.locations.length;i++){
-    firstPos = getPixelCoordinates(firstAirport);
-
-    let secondAirport = currentProfile.locations[i];
-    let secondPos = getPixelCoordinates(secondAirport);
-
-    stroke(0);
-    strokeWeight(2);
-    line(firstPos.x,firstPos.y,secondPos.x,secondPos.y);
-    ellipse(firstPos.x,firstPos.y,10,10);
-    ellipse(secondPos.x,secondPos.y,10,10);
-
-    firstAirport = secondAirport;
-  }
-
-  // image(currentProfile.profilePicture,0,windowHeight*mapHeightScale-480,640,480);
-
-  function getPixelCoordinates(IATA){
-    //check through all airports for matching IATA code
-    for (let r = 0; r < airports.getRowCount(); r++) {
-      let airport = airports.getString(r, 10); //IATA Code
-      if (IATA == airport){
-        let lat = airports.getString(r, 4);
-        let lng = airports.getString(r, 5);
-
-        return myMap.latLngToPixel(lat, lng);
-        break;
-      }
-    }
-  }
 }
 
 
