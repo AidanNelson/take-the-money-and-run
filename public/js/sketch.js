@@ -296,8 +296,8 @@ function makeGame(){
   goButton.mousePressed(addGoodAirports);
 
   // TEST FOR UPDATE FUNCTIONALITY
-  let saveButton = createButton("save").parent('control').class('gameControls');
-  saveButton.mousePressed(updateProfile);
+  // let saveButton = createButton("save").parent('control').class('gameControls');
+  // saveButton.mousePressed(updateProfile);
 
   let postcardButton = createButton("postcard").parent('control').class('gameControls');
   postcardButton.mousePressed(makePostcard);
@@ -319,6 +319,7 @@ function addGoodAirports(){
       (function(){
         currentProfile.drawRoutes();
       })();
+      updateProfile();
       break;
     }
   }
