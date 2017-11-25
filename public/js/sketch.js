@@ -274,7 +274,9 @@ function makeGame(){
     currentProfile.drawRoutes();
   });
 
-  setTimeout(currentProfile.drawRoutes,2000);
+  (function(){
+    currentProfile.drawRoutes();
+  })();
 
   // GAME CONTROLS
   let controlDiv = createElement('div');
@@ -314,7 +316,9 @@ function addGoodAirports(){
     if (airports.getString(r, 10) == toCheck){
       console.log('found airport');
       currentProfile.locations.push(toCheck);
-      currentProfile.drawRoutes();
+      (function(){
+        currentProfile.drawRoutes();
+      })();
       break;
     }
   }

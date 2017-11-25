@@ -5,13 +5,9 @@ class Profile{
     this.locations = data.locations;
     this.profilePicture = loadImage(data.profilePicture);
     this.currentProfileImageData = data.profilePicture;
-
-    console.log(this.locations);
   }
 
   forServer(){
-
-    console.log(this.locations);
     return {
       name: this.name,
       budget: this.budget,
@@ -22,8 +18,6 @@ class Profile{
 
   drawRoutes(){
     clear(); //clear canvas overlay
-
-    console.log(this.locations);
 
     //set first point for line
     let firstCity = this.locations[0];
