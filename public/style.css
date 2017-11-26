@@ -15,14 +15,60 @@ body {
   /*font globally*/
   font-family: oregon-trail;
   font-size: 10px;
+  color: white;
+}
+#bg-img {
+  position: fixed;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+}
+#old-map-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  min-width: 50%;
+  min-height: 50%;
+}
+
+.hidden{
+  position: absolute;
+  top: -1000px;
+  visibility: hidden;
+}
+
+#loginBox {
+  /*positioning for camera box */
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  width: 640px;
+  height: 680px;
+  transform: translate(-50%, 0);
+  border-width: 5px;
+  border-color: yellow;
+  border-style: solid;
 }
 
 #canvas {
   /*positioning for camera box */
   position: absolute;
-  top: 10px;
-  left: 50%;
-  transform: translate(-50%, 0);
+  top: 0px;
+  left: 0px;
+}
+
+#loginScreen{
+  position: absolute;
+  top: 480px;
+  left:0px;
+  width: 640px;
+  height: 200px;
+  background: grey;
+  color: black;
 }
 
 #postcard {
@@ -85,12 +131,24 @@ body {
   width:auto;
 }
 
+.loginControls {
+  padding:4px;
+  margin:4px;
+  color:black;
+  font-family: oregon-trail;
+  font-size:10px;
+}
+
 .gameControls {
   padding:4px;
   margin:4px;
-  color:grey;
+  color:white;
   font-family: oregon-trail;
   font-size:10px;
+}
+
+#controlInput {
+  color: black;
 }
 
 

@@ -27,6 +27,7 @@ class Profile{
     let firstPos = getPixelCoordinates(firstCity);
     ellipse(firstPos.x,firstPos.y,citySize,citySize);
 
+    pcLoc = firstPos;
 
     //go through all other locations, starting at the second location
     for (let i=1;i<this.locations.length;i++){
@@ -47,9 +48,12 @@ class Profile{
         fill(220,250,30); //yellow
       };
       ellipse(secondPos.x,secondPos.y,citySize,citySize);
+      pcLoc = secondPos;
 
       firstCity = secondCity;
     }
+
+
 
     function getPixelCoordinates(cityName){
       //check through all airports for matching city name

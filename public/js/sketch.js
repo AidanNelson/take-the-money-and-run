@@ -43,7 +43,7 @@ let airports;
 let canvas;
 let webcam;
 let mask;
-let mapHeightScale = 0.7; //division line between controls and map (btwn 0 and 1)
+let mapHeightScale = 0.85; //division line between controls and map (btwn 0 and 1)
 
 //
 let isLoggedIn = false;
@@ -101,7 +101,6 @@ function setup(){
   // song.setVolume(0.1);
   // song.play();
 
-  makeBottomBar();
   makeLoginScreen();
 
   // initialize socket connection to server
@@ -112,14 +111,14 @@ function setup(){
 }
 
 //update size of window if we are in game mode
-function onWindowResize(){
-  if (isLoggedIn){
-    resizeCanvas(windowWidth, windowHeight*mapHeightScale);
-  }
-  bottomBar.style('top',String(windowHeight*mapHeightScale).concat('px'));
-  bottomBar.style('height',String(windowHeight*(1-mapHeightScale)).concat('px'));
-  bottomBar.style('width',String(windowWidth).concat('px'));
-}
+// function windowResized(){
+//   if (isLoggedIn){
+//     resizeCanvas(windowWidth, windowHeight*mapHeightScale);
+//   }
+//   bottomBar.style('top',String(windowHeight*mapHeightScale).concat('px'));
+//   bottomBar.style('height',String(windowHeight*(1-mapHeightScale)).concat('px'));
+//   bottomBar.style('width',String(windowWidth).concat('px'));
+// }
 
 function makeBottomBar(){
   bottomBar = createElement('div');
@@ -131,44 +130,50 @@ function makeBottomBar(){
 }
 
 function makeLoginScreen(){
+
+  let loginBox = createElement('div');
+  loginBox.id('loginBox');
+
   canvas = createCanvas(640,480);
-  canvas.id('canvas');
+  canvas.id('canvas').parent('loginBox');
   webcam = createCapture(VIDEO);
   webcam.size(640, 480);
   webcam.hide();
 
   let loginScreen = createElement('div');
-  loginScreen.id('loginScreen').parent('bottomBar');
+  loginScreen.id('loginScreen').parent('loginBox');
 
-  createP(loginInstructions).parent('loginScreen').class('gameControls');
+  createP(loginInstructions).parent('loginScreen').class('loginControls');
 
   //picture taking stuff
-  let snapButton = createButton("snap").parent('loginScreen').class('gameControls');
+  let snapButton = createButton("snap").parent('loginScreen').class('loginControls');
   snapButton.mousePressed(takeProfilePicture);
-  let resetPictureButton = createButton("reset").parent('loginScreen').class('gameControls');
+  let resetPictureButton = createButton("reset").parent('loginScreen').class('loginControls');
   resetPictureButton.mousePressed(resetProfilePicture);
 
-  createElement('br').parent('loginScreen').class('gameControls');
+  createElement('br').parent('loginScreen').class('loginControls');
 
-  nameInput = createInput("name").parent('loginScreen').class('gameControls');
-  budgetInput = createInput("budget").parent('loginScreen').class('gameControls');
-  locationInput = createInput("location").parent('loginScreen').class('gameControls');
+  nameInput = createInput("name").parent('loginScreen').class('loginControls');
+  budgetInput = createInput("100").class('hidden');
+  locationInput = createInput("location").parent('loginScreen').class('loginControls');
   locationInput.id("locationAutocomplete");
   //jQuery autocomplete for locations...
   $( "#locationAutocomplete" ).autocomplete({
     source: airports.getColumn('municipality')
   });
-  let submitButton = createButton("submit new profile").parent('loginScreen').class('gameControls');
+
+
+  createElement('br').parent('loginScreen').class('loginControls');
+  createElement('br').parent('loginScreen').class('loginControls');
+
+  // loginInput = createInput("login name").parent('loginScreen').class('gameControls');
+  let submitButton = createButton("Sign Up").parent('loginScreen').class('loginControls');
   submitButton.mousePressed(sendNewProfile);
 
-  createElement('br').parent('loginScreen').class('gameControls');
-  createElement('br').parent('loginScreen').class('gameControls');
-
-  loginInput = createInput("login name").parent('loginScreen').class('gameControls');
-  let loginButton = createButton("login").parent('loginScreen').class('gameControls');
+  let loginButton = createButton("Sign In").parent('loginScreen').class('loginControls');
   loginButton.mousePressed(sendLoginAttempt);
 
-  loginResponse = createP("").parent('loginScreen').class('gameControls');
+  loginResponse = createP("").parent('loginScreen').class('loginControls');
   loginResponse.id('loginResponse');
 
 
@@ -244,16 +249,25 @@ function draw(){
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
+function mousePressed(){
+  let d = dist(mouseX,mouseY, pcLoc.x, pcLoc.y);
+  if (d<30){
+    makePostcard();
+  }
+}
+
+
+
+
 function makeGame(){
+  makeBottomBar();
+
   //get rid of login screen div, webcam and map
   select('#loginScreen').remove();
   webcam.remove();
   select("#old-map-image").remove();
 
-
-
   resizeCanvas(windowWidth, windowHeight*mapHeightScale);
-
 
   //start the mappa on the latest location's coordinates
   let currentCity = currentProfile.locations[currentProfile.locations.length-1];
@@ -292,9 +306,10 @@ function makeGame(){
     currentProfile.drawRoutes();
   })();
 
-  setTimeout(function(){
-    isLoggedIn = true; //only log in once the map is ready
-  },1000);
+  // setTimeout(function(){
+  //   isLoggedIn = true; //only log in once the map is ready
+  // },1000);
+  isLoggedIn = true;
 
   // GAME CONTROLS
   let controlDiv = createElement('div');
@@ -312,20 +327,26 @@ function makeGame(){
 
   let goButton = createButton("Go!").parent('control').class('gameControls');
   goButton.mousePressed(addGoodAirports);
+  goButton.style("color","black");
 
   // TEST FOR UPDATE FUNCTIONALITY
   // let saveButton = createButton("save").parent('control').class('gameControls');
   // saveButton.mousePressed(updateProfile);
 
-  let postcardButton = createButton("postcard").parent('control').class('gameControls');
-  postcardButton.mousePressed(makePostcard);
-  let closePostcardButton = createButton("close postcard").parent('control').class('gameControls');
-  closePostcardButton.mousePressed(closePostcard);
+  // let postcardButton = createButton("postcard").parent('control').class('gameControls');
+  // postcardButton.mousePressed(makePostcard);
+  // let closePostcardButton = createButton("close postcard").parent('control').class('gameControls');
+  // closePostcardButton.mousePressed(closePostcard);
 
-  gameResponse = createP("game response").parent('control').class('gameControls');
+  gameResponse = createP("You are in " + currentProfile.locations[currentProfile.locations.length-1]).parent('control').class('gameControls');
+  gameResponse.id('gameResponse');
 }
 
 function addGoodAirports(){
+  document.getElementById('gameResponse').remove();
+  gameResponse = createP("You are in " + currentProfile.locations[currentProfile.locations.length-1]).parent('control').class('gameControls');
+  gameResponse.id('gameResponse');
+
   let toCheck = controlInput.value();
   console.log('looking for airport: ' + toCheck);
   for (var r = 0; r < airports.getRowCount(); r++) {
@@ -353,8 +374,8 @@ function addGoodAirports(){
 
 // attempt to login to server
 function sendLoginAttempt(){
-  console.log("Attempting login by: " + loginInput.value());
-  socket.emit('login',loginInput.value());
+  console.log("Attempting login by: " + nameInput.value());
+  socket.emit('login',nameInput.value());
 }
 // response from server to login attempt
 function gotLoginResponse(data){
@@ -380,7 +401,16 @@ function sendNewProfile(){
     locations: [locationInput.value()],
     profilePicture: p5.prototype.returnImageData(canvas, 'myCanvas', 'png')
   }
-  socket.emit('newProfile',profile);
+  if (profile.name == "name"){
+    document.getElementById('loginResponse').innerHTML = 'Need a name!';
+  } else if (profile.locations[0] == "location"){
+    document.getElementById('loginResponse').innerHTML = 'Need a starting location!';
+  } else if (profilePic == null){
+    document.getElementById('loginResponse').innerHTML = 'Take a pic!';
+  } else{
+    socket.emit('newProfile',profile);
+    sendLoginAttempt();
+  }
 }
 
 // new profile response function
