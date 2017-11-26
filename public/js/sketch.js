@@ -292,7 +292,7 @@ function makeGame(){
     lng: currentLoc.lng,
     //set zoom level
     zoom: 2,
-    style: "http://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png"
+    style: "https://cartocdn_{s}.global.ssl.fastly.net/base-antique/{z}/{x}/{y}.png"
   }
   mappa = new Mappa('Leaflet');
   //call mappa object to create a tilemap at lat,long, zoom level
@@ -367,11 +367,6 @@ function addGoodAirports(){
 }
 
 
-
-
-
-
-
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////  SOCKETS STUFF  ///////////////////////////////////
@@ -421,7 +416,6 @@ function sendNewProfile(){
 function newProfileResponse(data){
   console.log(data);
 }
-
 
 //send update to server then to firebase
 function updateProfile(){
