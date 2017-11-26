@@ -148,13 +148,14 @@ function makePostcardText(iso){
   // let p4 = localHello + " my friend! Through these many days of wandering, " + countryName + " has proved a gem. XOXO, "+ currentProfile.name;
   // let p5 = localHello + " from an old fool!  In " + countryName + " I have found my greatest love.  I have forgone " + currency + " and am finally, unequicicably me: " + currentProfile.name;
 
-  let p6 = "hello: " + localHello + " / countryName: " + countryName + " / countryInfo: " + countryInfo.region + " / " +  countryInfo.name + " / " + countryInfo.dem + " / currency: " + currency + " / nationalDish: " + nationalDish + " / life length: " + lifeLength;
-
+  //let p6 = "hello: " + localHello + " / countryName: " + countryName + " / countryInfo: " + countryInfo.region + " / " +  countryInfo.name + " / " + countryInfo.dem + " / currency: " + currency + " / nationalDish: " + nationalDish + " / life length: " + lifeLength;
+  let p6 = localHello + " from " + countryInfo.name + ". I decided to leave everything behind and I now see myself surrounded by " + countryInfo.dem + "s . It has taken me some time to get used to this place, the " + nationalDish + " that " + countryInfo.dem + "s seem to love is not really my thing. Also it costs a lot of " + currency + ".";
   // let postcardTemplates = [p1,p2,p3,p4,p5];
   // let postcardText = createP(postcardTemplates[floor(random(postcardTemplates.length))]);
 
   return p6;
 }
+
 
 function makePostcard() {
   closePostcard();
@@ -171,18 +172,6 @@ function makePostcard() {
 
   let postcardText = makePostcardText(iso);
   searchFlickrAndMakePostcard(cityName, postcardText);
-
-  // setTimeout(function(){
-  //   console.log("imgUrl: " + postcardImgUrl);
-  //   // html stuff
-  //   let pcDiv = createElement('div');
-  //   pcDiv.id('postcard');
-  //   let bgImg = createImg(postcardImgUrl).parent('postcard').class('postcard');
-  //   let profImg = createImg(currentProfile.currentProfileImageData).parent('postcard').class('postcard');
-  //   profImg.id("profileImage");
-  //   let postcardTextP = createP(postcardText);
-  //   postcardTextP.parent('postcard').class('postcard');
-  // },2000);
 }
 
 

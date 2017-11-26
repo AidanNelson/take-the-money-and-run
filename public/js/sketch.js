@@ -155,8 +155,9 @@ function makeLoginScreen(){
 
   nameInput = createInput("name").parent('loginScreen').class('loginControls');
   budgetInput = createInput("100").class('hidden');
-  locationInput = createInput("location").parent('loginScreen').class('loginControls');
-  locationInput.id("locationAutocomplete");
+  createElement('br').parent('loginScreen').class('loginControls');
+  locationInput = createInput("starting location (choose from list)").parent('loginScreen').class('loginControls');
+  locationInput.id("locationAutocomplete").style("width","400px");
   //jQuery autocomplete for locations...
   $( "#locationAutocomplete" ).autocomplete({
     source: airports.getColumn('municipality')
@@ -338,14 +339,12 @@ function makeGame(){
   // let closePostcardButton = createButton("close postcard").parent('control').class('gameControls');
   // closePostcardButton.mousePressed(closePostcard);
 
-  gameResponse = createP("You are in " + currentProfile.locations[currentProfile.locations.length-1]).parent('control').class('gameControls');
+  gameResponse = createP("You have a postcard from " + currentProfile.locations[currentProfile.locations.length-1] + ". Click to read.").parent('control').class('gameControls');
   gameResponse.id('gameResponse');
 }
 
 function addGoodAirports(){
-  document.getElementById('gameResponse').remove();
-  gameResponse = createP("You are in " + currentProfile.locations[currentProfile.locations.length-1]).parent('control').class('gameControls');
-  gameResponse.id('gameResponse');
+
 
   let toCheck = controlInput.value();
   console.log('looking for airport: ' + toCheck);
@@ -360,6 +359,11 @@ function addGoodAirports(){
       break;
     }
   }
+
+
+  document.getElementById('gameResponse').remove();
+  gameResponse = createP("You have a postcard from " + currentProfile.locations[currentProfile.locations.length-1] + ". Click to read.").parent('control').class('gameControls');
+  gameResponse.id('gameResponse');
 }
 
 
