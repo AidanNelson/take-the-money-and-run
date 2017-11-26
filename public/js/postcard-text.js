@@ -114,7 +114,7 @@ function getLocalHello(iso){
 
 
 
-function searchFlickr(city){
+function searchFlickr(city, postcardText){
   let searchList = ["beach" , "skyline" , "nightlife" , "monument" , "fashion" , "bar" ];
   let searchWord = city + " " + searchList[floor(random(searchList.length))];
   console.log('your search is for: ' + " " + searchWord);
@@ -129,10 +129,17 @@ function searchFlickr(city){
       let newUrl  = "https://farm1.staticflickr.com/" + server + "/" + id + "_" + secret + "_b.jpg";
       urls.push(newUrl);
     }
-    postcardImgUrl = String(urls[floor(random(urls.length))]);
-    console.log(postcardImgUrl);
-  }
+    postcardImgUrl = urls[floor(random(urls.length))];
 
+    // html stuff
+    let pcDiv = createElement('div');
+    pcDiv.id('postcard');
+    let bgImg = createImg(postcardImgUrl).parent('postcard').class('postcard');
+    let profImg = createImg(currentProfile.currentProfileImageData).parent('postcard').class('postcard');
+    profImg.id("profileImage");
+    let postcardTextP = createP(postcardText);
+    postcardTextP.parent('postcard').class('postcard');
+  }
 }
 
 
@@ -154,7 +161,7 @@ function makePostcardText(iso){
   // let p4 = localHello + " my friend! Through these many days of wandering, " + countryName + " has proved a gem. XOXO, "+ currentProfile.name;
   // let p5 = localHello + " from an old fool!  In " + countryName + " I have found my greatest love.  I have forgone " + currency + " and am finally, unequicicably me: " + currentProfile.name;
 
-  let p6 = " / hello: " + localHello + " / countryName: " + countryName + " / countryInfo: " + countryInfo.region + countryInfo.name + countryInfo.dem + " / currency: " + currency + " / nationalDish: " + nationalDish + " / life length: " + lifeLength;
+  let p6 = "hello: " + localHello + " / countryName: " + countryName + " / countryInfo: " + countryInfo.region + " / " +  countryInfo.name + " / " + countryInfo.dem + " / currency: " + currency + " / nationalDish: " + nationalDish + " / life length: " + lifeLength;
 
   // let postcardTemplates = [p1,p2,p3,p4,p5];
   // let postcardText = createP(postcardTemplates[floor(random(postcardTemplates.length))]);
@@ -175,19 +182,19 @@ function makePostcard() {
   }
 
   let postcardText = makePostcardText(iso);
-  searchFlickr(cityName);
+  searchFlickr(cityName, postcardText);
 
-  setTimeout(function(){
-    console.log("imgUrl: " + postcardImgUrl);
-    // html stuff
-    let pcDiv = createElement('div');
-    pcDiv.id('postcard');
-    let bgImg = createImg(postcardImgUrl).parent('postcard').class('postcard');
-    let profImg = createImg(currentProfile.currentProfileImageData).parent('postcard').class('postcard');
-    profImg.id("profileImage");
-    let postcardTextP = createP(postcardText);
-    postcardTextP.parent('postcard').class('postcard');
-  },2000);
+  // setTimeout(function(){
+  //   console.log("imgUrl: " + postcardImgUrl);
+  //   // html stuff
+  //   let pcDiv = createElement('div');
+  //   pcDiv.id('postcard');
+  //   let bgImg = createImg(postcardImgUrl).parent('postcard').class('postcard');
+  //   let profImg = createImg(currentProfile.currentProfileImageData).parent('postcard').class('postcard');
+  //   profImg.id("profileImage");
+  //   let postcardTextP = createP(postcardText);
+  //   postcardTextP.parent('postcard').class('postcard');
+  // },2000);
 }
 
 
