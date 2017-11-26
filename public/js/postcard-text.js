@@ -15,18 +15,6 @@ let isoToCountry;
 let postcardImgUrl;
 
 
-
-
-
-
-function getInfo(iso){
-  let countryName = convertIsoToCountry(iso);
-  let countryInfo = countryToInformation(countryName);
-
-
-}
-
-
 //converts ISO code into Country name
 function convertIsoToCountry(iso) {
   //since JSON File consists of Objects you cant take length - convert it to array using keys function
@@ -58,7 +46,6 @@ function countryToInformation(country) {
   }
 }
 
-
 //add currency to country
 function countryToCurrency(country) {
   for (let i = 0; i < 242; i++) {
@@ -69,8 +56,6 @@ function countryToCurrency(country) {
     }
   }
 }
-
-
 
 function countryNationalDish(country) {
   for (let i = 0; i < 200; i++) {
@@ -95,7 +80,6 @@ function countryLifeExpectancy(country) {
 function getLocalHello(iso){
   let hello = "hello";
   for (let r=0;r<helloText.getRowCount();r++){
-    // console.log('checking ' + helloText.getString(r,0) + " against " + iso);
     if (helloText.getString(r,0)==iso){
       hello  =  helloText.getString(r,2);
       console.log(hello);
@@ -104,17 +88,7 @@ function getLocalHello(iso){
   return hello;
 }
 
-
-//
-
-//   text("Hello from " + country + " \nIf you don't know where it is it's " + info + "\nHope all is well \nI spend " + currencyCountry +
-//     " all the time " + "on " + NationDish + ", \n" + officialName + " " + ExpAge + demonym, 200, 200);
-//
-// }
-
-
-
-function searchFlickr(city, postcardText){
+function searchFlickrAndMakePostcard(city, postcardText){
   let searchList = ["beach" , "skyline" , "nightlife" , "monument" , "fashion" , "bar" ];
   let searchWord = city + " " + searchList[floor(random(searchList.length))];
   console.log('your search is for: ' + " " + searchWord);
@@ -153,8 +127,6 @@ function makePostcardText(iso){
   let nationalDish = countryNationalDish(countryName);
   let lifeLength = countryLifeExpectancy(countryName);
 
-
-
   // let p1 = localHello + " from " + countryName + " \n If you don't know where it is it's " + countryInfo + "\nHope all is well \nI spend " + currency + " all the time!";
   // let p2 = localHello + " from the land of " + countryName + "!  A pigeon alighted upon my finger this evening and tied to its foot was a small bundle of " + currency + "!  What a world is " + countryInfo + "! - " + currentProfile.name;
   // let p3 = "Three words, and then silence.  A poet is only as good as the " + currency + " in his pocket.  Luckily, " + countryName + " has welcomed me with open arms and the " + countryInfo + " is a place to behold.  "+ localHello + " ever Yours, " + currentProfile.name;
@@ -182,7 +154,7 @@ function makePostcard() {
   }
 
   let postcardText = makePostcardText(iso);
-  searchFlickr(cityName, postcardText);
+  searchFlickrAndMakePostcard(cityName, postcardText);
 
   // setTimeout(function(){
   //   console.log("imgUrl: " + postcardImgUrl);
