@@ -93,19 +93,19 @@ function preload(){
   LifeExpectancy = loadJSON(urlLifeExp);
   helloText = loadTable("assets/hello4.txt", "tsv");
 
-  // song = loadSound("assets/song.mp3");
+  song = loadSound("assets/song.mp3");
 }
 
 
 function setup(){
-  // song.setVolume(0.1);
-  // song.play();
+  song.setVolume(0.1);
+  song.play();
 
   makeLoginScreen();
 
   // initialize socket connection to server
-  // socket = io.connect('https://take-the-money-and-run.herokuapp.com/');
-  socket = io.connect('http://localhost:3000');
+  socket = io.connect('https://take-the-money-and-run.herokuapp.com/');
+  // socket = io.connect('http://localhost:3000');
   socket.on('login', gotLoginResponse);
   socket.on('newProfile',newProfileResponse);
 }
