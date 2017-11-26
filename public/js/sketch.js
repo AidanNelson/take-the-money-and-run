@@ -66,6 +66,10 @@ let helloText;
 // let countryInfo;
 // let currency;
 
+let pcLoc = {
+  x: -100,
+  y:-100
+}
 
 //div for all controls
 let bottomBar;

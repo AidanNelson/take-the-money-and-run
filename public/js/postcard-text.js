@@ -89,10 +89,11 @@ function getLocalHello(iso){
 }
 
 function searchFlickrAndMakePostcard(city, postcardText){
-  let searchList = ["beach" , "skyline" , "nightlife" , "monument" , "fashion" , "bar" ];
-  let searchWord = city + " " + searchList[floor(random(searchList.length))];
+  // let searchList = ["skyline" , "city", "landscape", "urban", "", "", "", ""];
+  // let searchWord = city + "," + searchList[floor(random(searchList.length))];
+  let searchWord = city;
   console.log('your search is for: ' + " " + searchWord);
-  let flickrAPI = "https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=43d46d0671093b54323ba9147cc4cc11&tags=" + searchWord + "&per_page=10&format=json&nojsoncallback=1";
+  let flickrAPI = "https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=43d46d0671093b54323ba9147cc4cc11&tags=" + searchWord + "&per_page=10&format=json&nojsoncallback=1&safe_search=1&content_type=1&media=photos&sort=relevance";
   loadJSON(flickrAPI,returnImageUrls);
   function returnImageUrls(jsonData){
     let urls = [];
@@ -103,16 +104,30 @@ function searchFlickrAndMakePostcard(city, postcardText){
       let newUrl  = "https://farm1.staticflickr.com/" + server + "/" + id + "_" + secret + "_b.jpg";
       urls.push(newUrl);
     }
+    // if (urls.length == 0){
+    //   searchFlickrAndMakePostcard(city, postcardText);
+    //   break;
+    // }
+    console.log(urls);
+
     postcardImgUrl = urls[floor(random(urls.length))];
 
     // html stuff
     let pcDiv = createElement('div');
     pcDiv.id('postcard');
+
     let bgImg = createImg(postcardImgUrl).parent('postcard').class('postcard');
+
     let profImg = createImg(currentProfile.currentProfileImageData).parent('postcard').class('postcard');
     profImg.id("profileImage");
+
+    let postcardTextDiv = createElement('div');
+    postcardTextDiv.id("postcardTextDiv").parent('postcard');
     let postcardTextP = createP(postcardText);
-    postcardTextP.parent('postcard').class('postcard');
+    postcardTextP.parent('postcardTextDiv');
+
+    let closeButton = createButton("X").parent('postcard').class('postcardButton');
+    closeButton.mousePressed(closePostcard);
   }
 }
 
@@ -142,6 +157,7 @@ function makePostcardText(iso){
 }
 
 function makePostcard() {
+  closePostcard();
   let cityName = currentProfile.locations[currentProfile.locations.length-1];
   let iso = getIso(cityName);
 
@@ -171,5 +187,6 @@ function makePostcard() {
 
 
 function closePostcard(){
-  select('#postcard').remove();
+  let pc = select('#postcard');
+  if (pc != null){ pc.remove();}
 }
