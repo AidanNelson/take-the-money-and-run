@@ -134,13 +134,25 @@ function searchFlickrAndMakePostcard(city, postcardText){
 
 
 function makePostcardText(iso){
-  let countryName = convertIsoToCountry(iso);
-  let localHello = getLocalHello(iso);
+  let countryName = "This country";
+  let localHello = "Hi";
+  let countryInfo = {
+    region: "around here",
+    name: "This country",
+    dem: "the local people"
+  };
+  let currency = "capital";
+  let nationalDish = "the national dish";
+  let lifeLength = "75";
 
-  let countryInfo = countryToInformation(countryName);
-  let currency = countryToCurrency(countryName);
-  let nationalDish = countryNationalDish(countryName);
-  let lifeLength = countryLifeExpectancy(countryName);
+
+  countryName = convertIsoToCountry(iso);
+  localHello = getLocalHello(iso);
+
+  countryInfo = countryToInformation(countryName);
+  currency = countryToCurrency(countryName);
+  nationalDish = countryNationalDish(countryName);
+  lifeLength = countryLifeExpectancy(countryName);
 
   // let p1 = localHello + " from " + countryName + " \n If you don't know where it is it's " + countryInfo + "\nHope all is well \nI spend " + currency + " all the time!";
   // let p2 = localHello + " from the land of " + countryName + "!  A pigeon alighted upon my finger this evening and tied to its foot was a small bundle of " + currency + "!  What a world is " + countryInfo + "! - " + currentProfile.name;
@@ -150,10 +162,29 @@ function makePostcardText(iso){
 
   //let p6 = "hello: " + localHello + " / countryName: " + countryName + " / countryInfo: " + countryInfo.region + " / " +  countryInfo.name + " / " + countryInfo.dem + " / currency: " + currency + " / nationalDish: " + nationalDish + " / life length: " + lifeLength;
   let p6 = localHello + " from " + countryInfo.name + ". I decided to leave everything behind and I now see myself surrounded by " + countryInfo.dem + "s . It has taken me some time to get used to this place, the " + nationalDish + " that " + countryInfo.dem + "s seem to love is not really my thing. Also it costs a lot of " + currency + ".";
-  // let postcardTemplates = [p1,p2,p3,p4,p5];
-  // let postcardText = createP(postcardTemplates[floor(random(postcardTemplates.length))]);
+  let p7 = localHello + " from a world traveller. I am living the dream. I exchanged all the money on your account into " + currency + " so I can gamble, drink and eat. The traditional dish here is " + nationalDish + " and it’s great. Well, I just wanted to send you an update from " + countryInfo.region + ". Will send you a postcard next time I need more money. Cheers from " + countryInfo.name;
+  let p8 = "Woooow. I randomly flew to " + countryInfo.region + " and ended up in " + countryName + ". Look at the picture, I am surrounded by " + countryInfo.dem + " s . They taught me the word "  + localHello + " -- their way of saying hello. I’m staying here for a while. The average life length is " + lifeLength + " probably because they eat a lot of " + nationalDish + ". Sayonara. XOXO, " + currentProfile.name;
 
-  return p6;
+  let p9 = "Yesterday, I learned to cook " + nationalDish + " from a chef here in " + countryName + ".  Boy was it hard!  So many ingredients! Love always, " + currentProfile.name;
+  let p10 = localHello +  " I just got out the airplane and screamed, \'I am finally in "+ countryName + "!!!\' when someone in a top hat corrected me, saying \'please, my dear, when in " + countryInfo.region + " we do not say " + countryName + ", rather we call it " + countryInfo.name  + ".\' Mind your P’s and Q’s!\' Rough start. Now I am off for some " + nationalDish + ". LOL.";
+  let p11 = "Wowzers.  Narrowly escaped death in " + countryName + "!  Just kidding!  Actually am having a blast easting " + nationalDish + ".  Sorry for the joke..." + currentProfile.name;
+  let p12 = "Am thinking of opening a restaurant selling " + nationalDish + "!  Come on down to " + countryName + " and help me!  I need a sous chef and also a lot of " + currency + ".  Sound good? " + currentProfile.name;
+  let p13 = "Have only been in " + countryName + " a few days and am already feeling like this is home.  All my best, " + currentProfile.name;
+  let p14 = "Greetings and salutations.  Had some trouble at the border, but am feeling so glad to be in " + countryInfo.region + " once again.  My travels have taught me patience.  Wish I could see you, " + currentProfile.name;
+  let p15 = countryInfo.name + " has taught me to love again.  With love, " + currentProfile.name;
+  let p16 = "Check it out!  This photo is the view from my tent.  You only see that in " + countryInfo.region;
+  let p17 = "The " + countryInfo.dem + " play a game called " + countryName + " Ball.  I don't understand the rules but it is sooooo fun.  I lost a lot of money so please send " + currency;
+  let p18 = "The " + countryInfo.dems + " are very tall people! And strong too! Did you know the average lifespan here is " + lifeLength;
+  let p19 = "I just got hustled.  :(  I paid 500,000 " + currency + " for a cab ride.  I also don't know where I am.  Please send a map. All good though!!" ;
+  let p20 = "Hey!  Where am I?  Can you call me on this pay phone? I am out of " + currency + ".  The number is +347889 223 893 2772 9299.  Don't worry about me!!";
+
+
+
+  let postcardTemplates = [p6,p7,p8,p9,p10, p11,p12,p13,p14,p15,p16,p17,p18,p19,p20];
+  let postcardText = postcardTemplates[floor(random(postcardTemplates.length))];
+  console.log(postcardText);
+  return postcardText;
+  // return p10;
 }
 
 
